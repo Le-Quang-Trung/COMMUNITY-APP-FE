@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from 'react-native';
+import React from 'react';
+import Navigation from '../navigation/Navigation';
 
 const index = () => {
   return (
-    <View>
-      <Text>index</Text>
+    <View style={{ flex: 1 }}>
+      <Navigation />
     </View>
-  )
-}
+  );
+};
 
-export default index
+export default index;
