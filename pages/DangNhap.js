@@ -32,7 +32,7 @@ const DangNhap = () => {
                         <TextInput placeholder='Nhập mật khẩu' placeholderTextColor={'gray'} secureTextEntry/>
                     </View>
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button}>
+                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TabScreen')}>
                             <Text style={styles.buttonText}>Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>

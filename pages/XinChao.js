@@ -20,12 +20,12 @@ const XinChao = () => {
             <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('TraCuu')}>
                 <Text style={styles.optionText}>Phụ huynh</Text>
                 <Image source={require('../assets/images/parents-vector.png')} style={styles.optionImage} />
-             </TouchableOpacity>
+            </TouchableOpacity>
 
-            <View style={styles.optionContainer}>
+            <TouchableOpacity style={styles.optionContainer}>
                 <Text style={styles.optionText}>Giảng viên</Text>
                 <Image source={require('../assets/images/college-teacher.png')} style={styles.optionImage} />
-            </View>
+            </TouchableOpacity>
         </View>
     );
 };
