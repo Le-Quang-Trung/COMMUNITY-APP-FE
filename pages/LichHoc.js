@@ -88,7 +88,7 @@ const LichHoc = () => {
     return (
         <View style={styles.container}>
             <View style={styles.headerbar}>
-                <TouchableOpacity onPress={() => navigation.navigate('DiemHocKy')}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
                     <AntDesign name="arrowleft" size={24} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.Headers}>Thời khóa biểu</Text>

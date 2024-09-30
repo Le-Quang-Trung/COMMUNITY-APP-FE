@@ -27,9 +27,7 @@ const DiemMonHoc = () => {
                     <AntDesign name="arrowleft" size={24} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.Headers}>Điểm môn học</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('ChuongTrinhKhung')}>
-                    <AntDesign name="arrowright" size={24} color="white" />
-                </TouchableOpacity>
+
             </View>
             <View style={styles.content}>
                 <View style={styles.subjectRow}>
@@ -90,7 +88,7 @@ const styles = StyleSheet.create({
     headerbar: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        //justifyContent: 'space-between',
         backgroundColor: '#0977FE',
         padding: 10,
     },
