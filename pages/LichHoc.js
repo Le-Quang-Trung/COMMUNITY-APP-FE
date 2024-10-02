@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     headerbar: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#0977FE",
+        backgroundColor: 'rgba(58, 131, 244, 0.4)',
         padding: 10,
     },
     Headers: {

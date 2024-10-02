@@ -17,6 +17,8 @@ import ThongBao from "../components/ThongBao";
 import LichHocLichThi from "../components/LichHocLichThi";
 import CaNhan from "../components/CaNhan";
 
+import TraCuuThongTin from "../pages/TraCuuThongTin.js";
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -130,10 +132,11 @@ const Navigation = () => {
         <Stack.Screen name="XinChao" component={XinChao} options={{ headerShown: false }} />
         <Stack.Screen name="TraCuu" component={TraCuu} options={{ headerShown: false }} />
         <Stack.Screen name="DangNhap" component={DangNhap} options={{ headerShown: false }} />
-        <Stack.Screen name="LichHoc" component={LichHoc} />
-        <Stack.Screen name="DiemHocKy" component={DiemHocKy} />
-        <Stack.Screen name="DiemMonHoc" component={DiemMonHoc} />
-        <Stack.Screen name="ChuongTrinhKhung" component={ChuongTrinhKhung} />
+        <Stack.Screen name="LichHoc" component={LichHoc} options={{ headerShown: false }}/>
+        <Stack.Screen name="DiemHocKy" component={DiemHocKy} options={{ headerShown: false }}/>
+        <Stack.Screen name="DiemMonHoc" component={DiemMonHoc} options={{ headerShown: false }}/>
+        <Stack.Screen name="ChuongTrinhKhung" component={ChuongTrinhKhung} options={{ headerShown: false }}/>
+        <Stack.Screen name="TraCuuThongTin" component={TraCuuThongTin} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

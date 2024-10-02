@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         //justifyContent: 'space-between',
-        backgroundColor: '#0977FE',
+        backgroundColor: 'rgba(58, 131, 244, 0.4)',
         padding: 10,
     },
     Headers: {

@@ -11,11 +11,16 @@ const TrangChu = () => {
             <View style={styles.header}>
                 <View style={styles.headerTop}>
                     <Text style={styles.headerText}>Xin chào, Lê Quang Trung</Text>
-                    <FontAwesome name="bell" size={24} color="white" />
+                    <TouchableOpacity onPress={() => navigation.navigate('Thông Báo')}>
+                        <FontAwesome name="bell" size={24} color="white" />
+                    </TouchableOpacity>
+                    
                 </View>
 
                 {/* Schedule inside Header */}
-                <View style={styles.scheduleContainer}>
+                <TouchableOpacity style={styles.scheduleContainer}
+                    onPress={() => navigation.navigate('LichHoc')}
+                >
                     <Image
                         style={styles.scheduleImage}
                         source={require('../assets/images/calendar.png')}
@@ -24,7 +29,7 @@ const TrangChu = () => {
                         <Text style={styles.scheduleTitle}>Lịch hôm nay:</Text>
                         <Text style={styles.scheduleContent}>Không tìm thấy lịch học/lịch thi</Text>
                     </View>
-                </View>
+                </TouchableOpacity>
             </View>
 
             {/* Functionalities */}
@@ -50,7 +55,7 @@ const functionsData = [
     { title: 'Chương trình khung', iconComponent: () => <Ionicons name="book-outline" size={40} color="green" />, navigateTo: 'ChuongTrinhKhung' },
     { title: 'Xem điểm', iconComponent: () => <Ionicons name="cash-outline" size={40} color="blue" />, navigateTo: 'DiemHocKy' },
     { title: 'Lịch học/ lịch thi', iconComponent: () => <Ionicons name="calendar-outline" size={40} color="orange" />, navigateTo: 'LichHoc' },
-    { title: 'Thông báo', iconComponent: () => <Ionicons name="notifications-outline" size={40} color="red" />, navigateTo: 'ThongBao' },
+    { title: 'Thông báo', iconComponent: () => <Ionicons name="notifications-outline" size={40} color="red" />, navigateTo: 'Thông Báo' },
     { title: 'Phiếu thu tổng hợp', iconComponent: () => <Ionicons name="file-tray-full-outline" size={40} color="lightblue" /> },
     { title: 'Thanh toán học phí', iconComponent: () => <FontAwesome5 name="search-dollar" size={40} color="black" /> },
     { title: 'Công nợ', iconComponent: () => <Ionicons name="document-text-outline" size={40} color="pink" /> },

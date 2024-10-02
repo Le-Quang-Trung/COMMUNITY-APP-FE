@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     login: {
-        color: 'black',
+        color: '#0977FE',
         fontWeight: 'bold',
         letterSpacing: 1.5,
         fontSize: 40,
