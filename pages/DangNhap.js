@@ -1,11 +1,26 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useState } from 'react'; // Import useState để quản lý trạng thái
+import { View, Text, StyleSheet, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { TextInput } from 'react-native-gesture-handler';
 import { TouchableOpacity } from 'react-native';
+import { loginSinhVien } from '../service/taikhoan.service';
 
 const DangNhap = () => {
     const navigation = useNavigation();
+    
+    // Khai báo các state để lưu thông tin đăng nhập
+    const [tenTaiKhoan, setTenTaiKhoan] = useState('');
+    const [matKhau, setMatKhau] = useState('');
+
+    const handleLogin = async () => {
+        try {
+            const userData = await loginSinhVien.loginSV(tenTaiKhoan, matKhau);
+            console.log('User data:', userData); // Xử lý dữ liệu người dùng sau khi đăng nhập thành công
+            navigation.navigate('TabScreen'); // Chuyển hướng sau khi đăng nhập thành công
+        } catch (error) {
+            Alert.alert('Lỗi', error.message); // Hiển thị thông báo lỗi
+        }
+    };
 
     return (
         <View style={styles.Container}>
@@ -26,13 +41,24 @@ const DangNhap = () => {
                 {/* form */}
                 <View style={styles.containerForm}>
                     <View style={styles.inputContainer}>
-                        <TextInput placeholder='Nhập mã sinh viên' placeholderTextColor={'gray'}/>
+                        <TextInput
+                            placeholder='Nhập mã sinh viên'
+                            placeholderTextColor={'gray'}
+                            value={tenTaiKhoan}
+                            onChangeText={setTenTaiKhoan} // Cập nhật state khi người dùng nhập
+                        />
                     </View>
                     <View style={styles.inputContainer}>
-                        <TextInput placeholder='Nhập mật khẩu' placeholderTextColor={'gray'} secureTextEntry/>
+                        <TextInput
+                            placeholder='Nhập mật khẩu'
+                            placeholderTextColor={'gray'}
+                            secureTextEntry
+                            value={matKhau}
+                            onChangeText={setMatKhau} // Cập nhật state khi người dùng nhập
+                        />
                     </View>
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TabScreen')}>
+                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
                             <Text style={styles.buttonText}>Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
