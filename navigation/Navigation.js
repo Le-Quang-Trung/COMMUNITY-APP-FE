@@ -16,6 +16,8 @@ import TrangChu from "../components/TrangChu";
 import ThongBao from "../components/ThongBao";
 import LichHocLichThi from "../components/LichHocLichThi";
 import CaNhan from "../components/CaNhan";
+import CongNo from "../pages/CongNo";
+import PhieuThu from "../pages/PhieuThu";
 
 import TraCuuThongTin from "../pages/TraCuuThongTin.js";
 
@@ -137,6 +139,9 @@ const Navigation = () => {
         <Stack.Screen name="DiemMonHoc" component={DiemMonHoc} options={{ headerShown: false }}/>
         <Stack.Screen name="ChuongTrinhKhung" component={ChuongTrinhKhung} options={{ headerShown: false }}/>
         <Stack.Screen name="TraCuuThongTin" component={TraCuuThongTin} options={{ headerShown: false }}/>
+        <Stack.Screen name="CongNo" component={CongNo} options={{ headerShown: false }}/>
+        <Stack.Screen name="PhieuThu" component={PhieuThu} options={{ headerShown: false }}/>
+        <Stack.Screen name="ThongBao" component={ThongBao} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
