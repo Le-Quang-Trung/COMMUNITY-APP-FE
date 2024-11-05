@@ -1,20 +1,41 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesome, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getSinhVienByMSSV } from '../service/sinhvien.service';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { userState, sinhVienDataState } from '../state';
 
 const TrangChu = () => {
+    const user = useRecoilValue(userState);
+    const sinhVienData = useRecoilValue(sinhVienDataState);
+    const setSinhVienData = useSetRecoilState(sinhVienDataState);
     const navigation = useNavigation();
+
+    useEffect(() => {
+        const fetchSinhVienData = async () => {
+            try {
+                const sinhVienData = await getSinhVienByMSSV(user.data.tenTaiKhoan);
+                setSinhVienData(sinhVienData); // Cập nhật vào Recoil
+            } catch (error) {
+                console.error('Lỗi khi lấy thông tin sinh viên:', error);
+                Alert.alert("Lỗi", "Không thể lấy thông tin sinh viên");
+            }
+        };
+
+        fetchSinhVienData();
+    }, [user.data.tenTaiKhoan, setSinhVienData]);
+   
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
                 <View style={styles.headerTop}>
-                    <Text style={styles.headerText}>Xin chào, Lê Quang Trung</Text>
+                    <Text style={styles.headerText}>Xin chào, {sinhVienData?.hoTen}</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Thông Báo')}>
                         <FontAwesome name="bell" size={24} color="white" />
                     </TouchableOpacity>
-                    
+
                 </View>
 
                 {/* Schedule inside Header */}

@@ -1,65 +1,92 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome } from '@expo/vector-icons';
+import { logout } from '../service/taikhoan.service';
+import { useRecoilValue } from 'recoil';
+import { sinhVienDataState, userState } from '../state';
 
 const CaNhan = () => {
+    const user = useRecoilValue(userState);
+    const { role, data } = user;
+    const sinhVienData = useRecoilValue(sinhVienDataState);
+    console.log("đây là dữ liệu sinh viên:", sinhVienData);
     const navigation = useNavigation();
+
+   
+    const handleLogout = async () => {
+        try {
+            await logout(data.tenTaiKhoan);
+            navigation.navigate('DangNhap', { role });
+        } catch (error) {
+            Alert.alert("Logout Error", error.message);
+        }
+    };
+
+    if (!sinhVienData) {
+        return (
+            <View style={styles.container}>
+                <Text>Đang tải thông tin sinh viên...</Text>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.name}>Thông tin sinh viên</Text>
+                <Text style={styles.name}>Thông tin {role}</Text>
                 <Image
                     style={styles.profileImage}
+                    // source={{ uri: sinhVienData.hinhAnh }}
                     source={require('../assets/images/parents-vector.png')}
                 />
-                <Text style={styles.name}>Lê Quang Trung</Text>
+                <Text style={styles.name}>{sinhVienData.hoTen}</Text>
             </View>
 
             <View style={styles.infoContainer}>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Trạng thái:</Text>
-                    <Text style={styles.value}>Đang học</Text>
+                    <Text style={styles.value}>{sinhVienData.trangThai}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Giới tính:</Text>
-                    <Text style={styles.value}>Nam</Text>
+                    <Text style={styles.value}>{sinhVienData.gioiTinh}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Ngày sinh:</Text>
-                    <Text style={styles.value}>31/05/2002</Text>
+                    <Text style={styles.value}>{new Date(sinhVienData.ngaySinh).toLocaleDateString()}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>MSSV:</Text>
-                    <Text style={styles.value}>20004621</Text>
+                    <Text style={styles.value}>{sinhVienData.mssv}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Lớp:</Text>
-                    <Text style={styles.value}>DHKTPM16ATT</Text>
+                    <Text style={styles.value}>{sinhVienData.lop}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Bậc đào tạo:</Text>
-                    <Text style={styles.value}>Đại học</Text>
+                    <Text style={styles.value}>{sinhVienData.bacDaoTao}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Khoa:</Text>
-                    <Text style={styles.value}>Công nghệ thông tin</Text>
+                    <Text style={styles.value}>{sinhVienData.khoa}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Chuyên ngành:</Text>
-                    <Text style={styles.value}>Kỹ thuật phần mềm - 7480103</Text>
+                    <Text style={styles.value}>{sinhVienData.nganh}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Địa chỉ:</Text>
-                    <Text style={styles.value}>Thành phố Hồ Chí Minh</Text>
+                    <Text style={styles.value}>{sinhVienData.diaChi}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Số điện thoại:</Text>
-                    <Text style={styles.value}>0886574809</Text>
+                    <Text style={styles.value}>{sinhVienData.soDT}</Text>
                 </View>
             </View>
 
-            <TouchableOpacity style={styles.touchable} onPress={() => navigation.navigate('DangNhap')}>
+            <TouchableOpacity style={styles.touchable} onPress={handleLogout}>
                 <View style={styles.buttonContainer}>
                     <FontAwesome name="sign-out" size={20} color="white" />
                     <Text style={styles.buttonText}>Đăng xuất</Text>
