@@ -12,3 +12,8 @@ export const sinhVienDataState = atom({
     key: 'sinhVienDataState',
     default: null,
 }); 
+
+export const giangVienDataState = atom({
+    key: 'giangVienDataState',
+    default: null,
+})

@@ -50,14 +50,14 @@ export const loginGiangVien = {
     }
 };
 
-export const logout = async (taikhoanId) => {
+export const logout = async (tenTaiKhoan) => {
     try {
         const response = await fetch(`${host}/taikhoan/logout`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ taikhoanId })
+            body: JSON.stringify({ tenTaiKhoan })
         });
 
         if (!response.ok) {

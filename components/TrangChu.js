@@ -2,46 +2,53 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesome, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { getSinhVienByMSSV } from '../service/sinhvien.service';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { userState, sinhVienDataState } from '../state';
+import { getSinhVienByMSSV } from '../service/sinhvien.service';
+import { getGiangVienByMaGV } from '../service/giangvien.service';
+import { userState, sinhVienDataState, giangVienDataState } from '../state';
 
 const TrangChu = () => {
     const user = useRecoilValue(userState);
     const sinhVienData = useRecoilValue(sinhVienDataState);
+    const giangVienData = useRecoilValue(giangVienDataState);
     const setSinhVienData = useSetRecoilState(sinhVienDataState);
+    const setGiangVienData = useSetRecoilState(giangVienDataState); 
     const navigation = useNavigation();
 
     useEffect(() => {
-        const fetchSinhVienData = async () => {
+        const fetchUserData = async () => {
             try {
-                const sinhVienData = await getSinhVienByMSSV(user.data.tenTaiKhoan);
-                setSinhVienData(sinhVienData); // Cập nhật vào Recoil
+                if (user.role === 'sinh viên') {
+                    const sinhVienData = await getSinhVienByMSSV(user.data.tenTaiKhoan);
+                    setSinhVienData(sinhVienData); // Cập nhật thông tin sinh viên vào Recoil
+                } else if (user.role === 'giảng viên') {
+                    const giangVienData = await getGiangVienByMaGV(user.data.tenTaiKhoan);
+                    setGiangVienData(giangVienData); // Cập nhật thông tin giảng viên vào Recoil
+                }
             } catch (error) {
-                console.error('Lỗi khi lấy thông tin sinh viên:', error);
-                Alert.alert("Lỗi", "Không thể lấy thông tin sinh viên");
+                console.error('Lỗi khi lấy thông tin người dùng:', error);
+                Alert.alert("Lỗi", "Không thể lấy thông tin người dùng");
             }
         };
 
-        fetchSinhVienData();
-    }, [user.data.tenTaiKhoan, setSinhVienData]);
-   
+        fetchUserData();
+    }, [user.role, user.data.tenTaiKhoan, setSinhVienData, setGiangVienData]);
+
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
                 <View style={styles.headerTop}>
-                    <Text style={styles.headerText}>Xin chào, {sinhVienData?.hoTen}</Text>
+                    <Text style={styles.headerText}>
+                        Xin chào, {user.role === 'sinh viên' ? sinhVienData?.hoTen : giangVienData?.tenGV}
+                    </Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Thông Báo')}>
                         <FontAwesome name="bell" size={24} color="white" />
                     </TouchableOpacity>
-
                 </View>
 
                 {/* Schedule inside Header */}
-                <TouchableOpacity style={styles.scheduleContainer}
-                    onPress={() => navigation.navigate('LichHoc')}
-                >
+                <TouchableOpacity style={styles.scheduleContainer} onPress={() => navigation.navigate('LichHoc')}>
                     <Image
                         style={styles.scheduleImage}
                         source={require('../assets/images/calendar.png')}
@@ -57,21 +64,17 @@ const TrangChu = () => {
             <Text style={styles.functionsTitle}>Chức năng</Text>
             <View style={styles.functionsContainer}>
                 {functionsData.map((item, index) => (
-                    <TouchableOpacity key={index} style={styles.functionItem}
-                        onPress={() => navigation.navigate(item.navigateTo)}
-                    >
-                        <View style={styles.iconContainer}>
-                            {item.iconComponent()}
-                        </View>
+                    <TouchableOpacity key={index} style={styles.functionItem} onPress={() => navigation.navigate(item.navigateTo)}>
+                        <View style={styles.iconContainer}>{item.iconComponent()}</View>
                         <Text style={styles.functionText}>{item.title}</Text>
                     </TouchableOpacity>
-
                 ))}
             </View>
         </View>
     );
 };
 
+// Thông tin các chức năng
 const functionsData = [
     { title: 'Chương trình khung', iconComponent: () => <Ionicons name="book-outline" size={40} color="green" />, navigateTo: 'ChuongTrinhKhung' },
     { title: 'Xem điểm', iconComponent: () => <Ionicons name="cash-outline" size={40} color="blue" />, navigateTo: 'DiemHocKy' },
@@ -159,14 +162,14 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#FFFFFF',  // Màu nền trắng cho vòng tròn
+        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 5,  // Hiệu ứng đổ bóng
+        elevation: 5,
     },
     functionText: {
         fontSize: 14,
