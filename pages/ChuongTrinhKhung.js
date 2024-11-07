@@ -1,48 +1,39 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Button, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { getChuongTrinhKhung } from '../service/chuongtrinhkhung.service';
+import { useRecoilValue } from 'recoil';
+import { sinhVienDataState } from '../state';
 
-const ChuongTrinhKhung = () => {
+const ChuongTrinhKhung = ({ MSSV }) => {
     const navigation = useNavigation();
+    const sinhVienData = useRecoilValue(sinhVienDataState);
+
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState(null);
+    const [semesterData, setSemesterData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const semesters = Array.from({ length: 9 }, (_, i) => `Học kỳ ${i + 1}`);
 
-    const semesterDetails = {
-        'Học kỳ 1': { totalCredits: 20, requiredCredits: 15, electiveCredits: 5 },
-        'Học kỳ 2': { totalCredits: 18, requiredCredits: 12, electiveCredits: 6 },
-        // Thêm các học kỳ khác tương tự
-    };
-
-    const subjects = {
-        'Học kỳ 1': {
-            required: [
-                { name: 'Toán cao cấp', credits: 3 },
-                { name: 'Lý thuyết mạch', credits: 2 },
-            ],
-            elective: [
-                { name: 'Kỹ thuật lập trình', credits: 3 },
-                { name: 'Cơ sở dữ liệu', credits: 2 },
-            ],
-        },
-        'Học kỳ 2': {
-            required: [
-                { name: 'Vật lý đại cương', credits: 3 },
-                { name: 'Hóa học đại cương', credits: 2 },
-            ],
-            elective: [
-                { name: 'Mạng máy tính', credits: 3 },
-                { name: 'Hệ điều hành', credits: 2 },
-            ],
-        },
-        // Thêm các học kỳ khác tương tự
-    };
-
-    const handleSelectSemester = (semester) => {
+    const handleSelectSemester = async (semester) => {
         setSelectedSemester(semester);
         setModalVisible(false);
+        setLoading(true);
+        setError(null);
+
+        const hocKyNumber = `HK${semester.split(" ")[2]}`;
+
+        try {
+            const data = await getChuongTrinhKhung(sinhVienData.mssv, hocKyNumber);
+            setSemesterData(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -83,30 +74,36 @@ const ChuongTrinhKhung = () => {
                     </View>
                 </View>
             </Modal>
-            {selectedSemester && semesterDetails[selectedSemester] && (
+
+            {loading && <ActivityIndicator size="large" color="#0000ff" />}
+            {error && <Text style={styles.errorText}>Error: {error}</Text>}
+
+            {semesterData && (
                 <View style={styles.detailsContainer}>
-                    <Text style={styles.detailText}>Tổng số tín chỉ: {semesterDetails[selectedSemester].totalCredits}</Text>
-                    <Text style={styles.detailText}>Tín chỉ học phần bắt buộc: {semesterDetails[selectedSemester].requiredCredits}</Text>
-                    <Text style={styles.detailText}>Tín chỉ học phần tự chọn: {semesterDetails[selectedSemester].electiveCredits}</Text>
+                    <Text style={styles.detailText}>Tổng số tín chỉ: {semesterData.chuongtrinhkhung.tinChiBatBuoc + semesterData.chuongtrinhkhung.tinChiTuChon}</Text>
+                    <Text style={styles.detailText}>Tín chỉ bắt buộc: {semesterData.chuongtrinhkhung.tinChiBatBuoc}</Text>
+                    <Text style={styles.detailText}>Tín chỉ tự chọn: {semesterData.chuongtrinhkhung.tinChiTuChon}</Text>
+
                     <Text style={styles.subjectHeader}>Học phần bắt buộc:</Text>
                     <FlatList
-                        data={subjects[selectedSemester]?.required || []}
-                        keyExtractor={(item) => item.name}
+                        data={semesterData.monHocs.filter(mon => mon.phanLoai === 'Bắt buộc')}
+                        keyExtractor={(item) => item.maMonHoc}
                         renderItem={({ item }) => (
                             <View style={styles.subjectRow}>
-                                <Text style={styles.subjectName}>{item.name}</Text>
-                                <Text style={styles.subjectCredits}>{item.credits}</Text>
+                                <Text style={styles.subjectName}>{item.tenMonHoc}</Text>
+                                <Text style={styles.subjectCredits}>{item.tinChi}</Text>
                             </View>
                         )}
                     />
+
                     <Text style={styles.subjectHeader}>Học phần tự chọn:</Text>
                     <FlatList
-                        data={subjects[selectedSemester]?.elective || []}
-                        keyExtractor={(item) => item.name}
+                        data={semesterData.monHocs.filter(mon => mon.phanLoai === 'Tự chọn')}
+                        keyExtractor={(item) => item.maMonHoc}
                         renderItem={({ item }) => (
                             <View style={styles.subjectRow}>
-                                <Text style={styles.subjectName}>{item.name}</Text>
-                                <Text style={styles.subjectCredits}>{item.credits}</Text>
+                                <Text style={styles.subjectName}>{item.tenMonHoc}</Text>
+                                <Text style={styles.subjectCredits}>{item.tinChi}</Text>
                             </View>
                         )}
                     />
@@ -119,86 +116,20 @@ const ChuongTrinhKhung = () => {
 export default ChuongTrinhKhung;
 
 const styles = StyleSheet.create({
-    Container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        padding: 20,
-    },
-    headerbar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#0977FE',
-        padding: 10,
-    },
-    Headers: {
-        color: 'white',
-        fontSize: 20,
-        marginLeft: 10,
-    },
-    dropdown: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 10,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 5,
-        marginTop: 20,
-    },
-    dropdownText: {
-        fontSize: 16,
-        color: 'black',
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        width: '80%',
-        backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 20,
-        alignItems: 'center',
-    },
-    modalItem: {
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-    },
-    modalItemText: {
-        fontSize: 16,
-        color: 'black',
-    },
-    detailsContainer: {
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 5,
-    },
-    detailText: {
-        fontSize: 16,
-        color: 'black',
-        marginVertical: 2,
-    },
-    subjectHeader: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginTop: 10,
-    },
-    subjectRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-    },
-    subjectName: {
-        fontSize: 16,
-        color: 'black',
-    },
-    subjectCredits: {
-        fontSize: 16,
-        color: 'black',
-    },
+    Container: { flex: 1, backgroundColor: '#fff', padding: 20 },
+    headerbar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0977FE', padding: 10 },
+    Headers: { color: 'white', fontSize: 20, marginLeft: 10 },
+    dropdown: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5, marginTop: 20 },
+    dropdownText: { fontSize: 16, color: 'black' },
+    modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+    modalContent: { width: '80%', backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center' },
+    modalItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+    modalItemText: { fontSize: 16, color: 'black' },
+    detailsContainer: { marginTop: 20, padding: 10, backgroundColor: '#f9f9f9', borderRadius: 5 },
+    detailText: { fontSize: 16, color: 'black', marginVertical: 2 },
+    subjectHeader: { fontSize: 18, fontWeight: 'bold', marginTop: 10 },
+    subjectRow: { flexDirection: 'row', justifyContent: 'space-between', padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+    subjectName: { fontSize: 16, color: 'black' },
+    subjectCredits: { fontSize: 16, color: 'black' },
+    errorText: { color: 'red', fontSize: 16, textAlign: 'center', marginTop: 20 },
 });
