@@ -18,3 +18,21 @@ export const getMonHocByHocKy = async (mssv, hocky) => {
   }
 };
 
+
+export const getMaLopHocPhan = async (mssv, maMonHoc) => {
+    try {
+        const response = await fetch(`${host}/monhoc/getMaLopHocPhan/${mssv}/${maMonHoc}`);
+        
+        // Kiểm tra nếu không thành công
+        if (!response.ok) {
+            throw new Error('Không thể lấy dữ liệu mã lớp học phần');
+        }
+        
+        const data = await response.json();  // Chuyển đổi dữ liệu trả về sang JSON
+        return data;  // Trả về danh sách maLHP từ backend
+    } catch (error) {
+        console.error("Error fetching maLHP:", error);
+        throw new Error(error.message || 'Không thể lấy mã lớp học phần');
+    }
+};
+
