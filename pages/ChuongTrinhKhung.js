@@ -6,7 +6,7 @@ import { getChuongTrinhKhung } from '../service/chuongtrinhkhung.service';
 import { useRecoilValue } from 'recoil';
 import { sinhVienDataState } from '../state';
 
-const ChuongTrinhKhung = ({ MSSV }) => {
+const ChuongTrinhKhung = () => {
     const navigation = useNavigation();
     const sinhVienData = useRecoilValue(sinhVienDataState);
 
