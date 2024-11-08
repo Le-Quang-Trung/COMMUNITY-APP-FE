@@ -11,7 +11,7 @@ const XinChao = () => {
             <Text style={styles.text}>Đại học Công nghiệp Thành phố Hồ Chí Minh</Text>
             <Text style={styles.text}>Vui lòng chọn tùy chọn để tiếp tục</Text>
 
-            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('DangNhap')}>
+            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('DangNhap', { role: 'sinh viên' })}>
                 <Text style={styles.optionText}>Sinh viên</Text>
                 <Image source={require('../assets/images/college-student.png')} style={styles.optionImage} />
             </TouchableOpacity>
@@ -22,7 +22,7 @@ const XinChao = () => {
                 <Image source={require('../assets/images/parents-vector.png')} style={styles.optionImage} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.optionContainer}>
+            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('DangNhap', { role: 'giảng viên' })}>
                 <Text style={styles.optionText}>Giảng viên</Text>
                 <Image source={require('../assets/images/college-teacher.png')} style={styles.optionImage} />
             </TouchableOpacity>

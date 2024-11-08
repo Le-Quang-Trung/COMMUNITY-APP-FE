@@ -19,6 +19,8 @@ import CaNhan from "../components/CaNhan";
 import CongNo from "../pages/CongNo";
 import PhieuThu from "../pages/PhieuThu";
 
+import TraCuuThongTin from "../pages/TraCuuThongTin.js";
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -136,9 +138,9 @@ const Navigation = () => {
         <Stack.Screen name="DiemHocKy" component={DiemHocKy} options={{ headerShown: false }}/>
         <Stack.Screen name="DiemMonHoc" component={DiemMonHoc} options={{ headerShown: false }}/>
         <Stack.Screen name="ChuongTrinhKhung" component={ChuongTrinhKhung} options={{ headerShown: false }}/>
+        <Stack.Screen name="TraCuuThongTin" component={TraCuuThongTin} options={{ headerShown: false }}/>
         <Stack.Screen name="CongNo" component={CongNo} options={{ headerShown: false }}/>
         <Stack.Screen name="PhieuThu" component={PhieuThu} options={{ headerShown: false }}/>
-        <Stack.Screen name="ThongBao" component={ThongBao} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,11 +1,38 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useState } from 'react'; // Import useState để quản lý trạng thái
+import { View, Text, StyleSheet, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { TextInput } from 'react-native-gesture-handler';
 import { TouchableOpacity } from 'react-native';
+import { loginSinhVien, loginGiangVien } from '../service/taikhoan.service';
+import { useSetRecoilState } from 'recoil';
+import { userState } from '../state';
 
-const DangNhap = () => {
+const DangNhap = ({ route }) => {
+    const { role } = route.params; // Lấy vai trò từ route params
     const navigation = useNavigation();
+
+    // Khai báo các state để lưu thông tin đăng nhập
+    const setUserState = useSetRecoilState(userState);
+    const [tenTaiKhoan, setTenTaiKhoan] = useState('');
+    const [matKhau, setMatKhau] = useState('');
+
+     // Hàm handleLogin điều chỉnh để gọi API đúng dựa vào role
+     const handleLogin = async () => {
+        try {
+            let userData;
+            if (role === 'sinh viên') {
+                userData = await loginSinhVien.loginSV(tenTaiKhoan, matKhau);
+            } else if (role === 'giảng viên') {
+                userData = await loginGiangVien.loginGV(tenTaiKhoan, matKhau);
+            }
+            console.log('User data:', userData); 
+
+            setUserState({ role, data: userData });
+            navigation.navigate('TabScreen'); 
+        } catch (error) {
+            Alert.alert('Lỗi', error.message); 
+        }
+    };
 
     return (
         <View style={styles.Container}>
@@ -26,13 +53,24 @@ const DangNhap = () => {
                 {/* form */}
                 <View style={styles.containerForm}>
                     <View style={styles.inputContainer}>
-                        <TextInput placeholder='Nhập mã sinh viên' placeholderTextColor={'gray'}/>
+                        <TextInput
+                            placeholder={`Nhập mã ${role}`}
+                            placeholderTextColor={'gray'}
+                            value={tenTaiKhoan}
+                            onChangeText={setTenTaiKhoan} // Cập nhật state khi người dùng nhập
+                        />
                     </View>
                     <View style={styles.inputContainer}>
-                        <TextInput placeholder='Nhập mật khẩu' placeholderTextColor={'gray'} secureTextEntry/>
+                        <TextInput
+                            placeholder='Nhập mật khẩu'
+                            placeholderTextColor={'gray'}
+                            secureTextEntry
+                            value={matKhau}
+                            onChangeText={setMatKhau} // Cập nhật state khi người dùng nhập
+                        />
                     </View>
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TabScreen')}>
+                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
                             <Text style={styles.buttonText}>Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
@@ -83,7 +121,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     login: {
-        color: 'black',
+        color: '#0977FE',
         fontWeight: 'bold',
         letterSpacing: 1.5,
         fontSize: 40,
@@ -92,28 +130,32 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         marginHorizontal: 16,
-        spaceY: 16,            
+        spaceY: 16,
     },
     inputContainer: {
-        backgroundColor: 'rgba(0, 0, 0, 0.05)', 
-        padding: 20,         
-        borderRadius: 20,   
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        padding: 20,
+        borderRadius: 20,
         width: '100%',
-        marginBottom: 13,   
+        marginBottom: 13,
     },
     buttonContainer: {
-        width: '100%',       
+        width: '100%',
     },
     button: {
-        backgroundColor: '#38bdf8', 
-        padding: 12,           
-        borderRadius: 20,     
-        marginBottom: 12,      
+        backgroundColor: '#38bdf8',
+        padding: 12,
+        borderRadius: 20,
+        marginBottom: 12,
     },
     buttonText: {
-        fontSize: 20,         
-        fontWeight: 'bold',   
-        color: 'white',       
-        textAlign: 'center',  
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+    },
+    text: {
+        fontSize: 20,
+        marginBottom: 20
     },
 });

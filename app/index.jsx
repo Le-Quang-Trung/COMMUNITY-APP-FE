@@ -1,13 +1,16 @@
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import React from 'react';
 import Navigation from '../navigation/Navigation';
+import { RecoilRoot } from 'recoil'; 
 
-const index = () => {
+const Index = () => {
   return (
-    <View style={{ flex: 1 }}>
-      <Navigation />
-    </View>
+    <RecoilRoot>
+      <View style={{ flex: 1 }}>
+        <Navigation />
+      </View>
+    </RecoilRoot>
   );
 };
 
-export default index;
+export default Index;

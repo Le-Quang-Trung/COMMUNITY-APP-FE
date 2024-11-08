@@ -1,25 +1,22 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, FlatList, TouchableOpacity, Modal, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Text, FlatList, TouchableOpacity, Modal, Button, ActivityIndicator } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
+import { getMonHocByHocKy } from '../service/monhoc.service';
+import { useRecoilValue } from 'recoil';
+import { sinhVienDataState } from '../state';
 
 const DiemHocKy = () => {
     const navigation = useNavigation();
+    const sinhVienData = useRecoilValue(sinhVienDataState);
+    
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState(null);
+    const [semesterData, setSemesterData] = useState(null); 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const semesters = Array.from({ length: 9 }, (_, i) => `Học kỳ ${i + 1}`);
-    const subjects = {
-        'Học kỳ 1': [
-            { name: 'Toán cao cấp', credits: 3 },
-            { name: 'Lý thuyết mạch', credits: 2 },
-        ],
-        'Học kỳ 2': [
-            { name: 'Vật lý đại cương', credits: 3 },
-            { name: 'Hóa học đại cương', credits: 2 },
-        ],
-        // Thêm các học kỳ khác tương tự
-    };
 
     const semesterGrades = {
         'Học kỳ 1': {
@@ -41,11 +38,23 @@ const DiemHocKy = () => {
         // Thêm các học kỳ khác tương tự
     };
 
-    const handleSelectSemester = (semester) => {
+    const handleSelectSemester = async (semester) => {
         setSelectedSemester(semester);
         setModalVisible(false);
-    };
+        setLoading(true);
+        setError(null);
 
+        const hocKyNumber = `HK${semester.split(" ")[2]}`;
+
+        try {
+            const data = await getMonHocByHocKy(sinhVienData.mssv, hocKyNumber);
+            setSemesterData(data); // Update semesterData with the fetched data
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <View style={styles.container}>
             <View style={styles.headerbar}>
@@ -54,12 +63,16 @@ const DiemHocKy = () => {
                 </TouchableOpacity>
                 <Text style={styles.Headers}>Điểm học phần</Text>
             </View>
+
+            {/* Dropdown chọn học kỳ */}
             <TouchableOpacity style={styles.dropdown} onPress={() => setModalVisible(true)}>
                 <Text style={styles.dropdownText}>
                     {selectedSemester ? selectedSemester : 'Chọn học kỳ'}
                 </Text>
                 <AntDesign name="down" size={16} color="black" />
             </TouchableOpacity>
+
+            {/* Modal chọn học kỳ */}
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -84,18 +97,23 @@ const DiemHocKy = () => {
                     </View>
                 </View>
             </Modal>
-            {selectedSemester && (
+
+            {loading && <ActivityIndicator size="large" color="#0000ff" />}
+            {error && <Text style={styles.errorText}>Error: {error}</Text>}
+
+            {/* Hiển thị môn học và điểm học kỳ nếu có */}
+            {semesterData && (
                 <>
                     <FlatList
-                        data={subjects[selectedSemester] || []}
-                        keyExtractor={(item) => item.name}
+                        data={semesterData}
+                        keyExtractor={(item) => item.maMonHoc}
                         renderItem={({ item }) => (
                             <TouchableOpacity
                                 style={styles.subjectRow}
                                 onPress={() => navigation.navigate('DiemMonHoc', { subject: item })}
                             >
-                                <Text style={styles.subjectName}>{item.name}</Text>
-                                <Text style={styles.subjectCredits}>{item.credits}</Text>
+                                <Text style={styles.subjectName}>{item.tenMonHoc}</Text>
+                                <Text style={styles.subjectCredits}>{item.tinChi}</Text>
                             </TouchableOpacity>
                         )}
                         ListHeaderComponent={() => (
@@ -107,12 +125,24 @@ const DiemHocKy = () => {
                     />
                     {semesterGrades[selectedSemester] ? (
                         <View style={styles.gradesContainer}>
-                            <Text style={styles.gradeText}>Điểm trung bình học kỳ: {semesterGrades[selectedSemester].gpa}</Text>
-                            <Text style={styles.gradeText}>Điểm trung bình học kỳ (thang 4): {semesterGrades[selectedSemester].gpa4}</Text>
-                            <Text style={styles.gradeText}>Điểm chữ: {semesterGrades[selectedSemester].letterGrade}</Text>
-                            <Text style={styles.gradeText}>Xếp loại: {semesterGrades[selectedSemester].classification}</Text>
-                            <Text style={styles.gradeText}>Số tín chỉ đã đạt: {semesterGrades[selectedSemester].creditsEarned}</Text>
-                            <Text style={styles.gradeText}>Số tín chỉ nợ: {semesterGrades[selectedSemester].creditsOwed}</Text>
+                            <Text style={styles.gradeText}>
+                                Điểm trung bình học kỳ: {semesterGrades[selectedSemester]?.gpa}
+                            </Text>
+                            <Text style={styles.gradeText}>
+                                Điểm trung bình học kỳ (thang 4): {semesterGrades[selectedSemester]?.gpa4}
+                            </Text>
+                            <Text style={styles.gradeText}>
+                                Điểm chữ: {semesterGrades[selectedSemester]?.letterGrade}
+                            </Text>
+                            <Text style={styles.gradeText}>
+                                Xếp loại: {semesterGrades[selectedSemester]?.classification}
+                            </Text>
+                            <Text style={styles.gradeText}>
+                                Số tín chỉ đã đạt: {semesterGrades[selectedSemester]?.creditsEarned}
+                            </Text>
+                            <Text style={styles.gradeText}>
+                                Số tín chỉ nợ: {semesterGrades[selectedSemester]?.creditsOwed}
+                            </Text>
                         </View>
                     ) : (
                         <View style={styles.gradesContainer}>
@@ -121,6 +151,9 @@ const DiemHocKy = () => {
                     )}
                 </>
             )}
+
+            {/* Hiển thị loading khi đang tải dữ liệu */}
+            {loading && <Text>Đang tải dữ liệu...</Text>}
         </View>
     );
 };
@@ -136,7 +169,7 @@ const styles = StyleSheet.create({
     headerbar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#0977FE',
+        backgroundColor: 'rgba(58, 131, 244, 0.4)',
         padding: 10,
     },
     Headers: {

@@ -7,15 +7,9 @@ const TraCuu = () => {
 
     return (
         <View style={styles.Container}>
-            <TouchableOpacity style={styles.optionContainer}>
+            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('TraCuuThongTin')}>
                 <Text style={styles.optionText}>Tra cứu thông tin</Text>
                 <Image source={require('../assets/images/tra-cuu-thong-tin.png')} style={styles.optionImage} />
-            </TouchableOpacity>
-
-
-            <TouchableOpacity style={styles.optionContainer}>
-                <Image source={require('../assets/images/tra-cuu-van-bang.png')} style={styles.optionImage} />
-                <Text style={styles.optionText}>Tra cứu văn bằng</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.optionContainer}>
