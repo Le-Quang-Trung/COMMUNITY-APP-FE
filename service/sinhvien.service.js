@@ -1,4 +1,4 @@
-export const host = "http://192.168.1.15:8080"
+import { host } from './config';
 
 
 export const getSinhVienByMSSV = async (mssv) => {
