@@ -3,58 +3,55 @@ import { View, StyleSheet, Text, FlatList, TouchableOpacity, Modal, Button } fro
 import AntDesign from '@expo/vector-icons/AntDesign';
 import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
+import { getLichHocByMSSV } from '../service/lichhoclichthi.service';
+import { useRecoilValue } from 'recoil';
+import { sinhVienDataState } from '../state';
 
-const sampleData = {
-  "maLichHoc": "LH001",
-  "maLHP": "LHP001",
-  "maMonHoc": "MH001",
-  "lichHoc": [
-    {
-      "ngayHoc": 2,  // Thứ Ba
-      "tietHoc": "1-3",
-      "phongHoc": "A101"
-    },
-    {
-      "ngayHoc": 4,  // Thứ Năm
-      "tietHoc": "1-3",
-      "phongHoc": "A102"
-    }
-  ],
-  "ngayBatDau": "2024-11-01",
-  "ngayKetThuc": "2024-12-15",
-  "GV": "Nguyen Van A",
-  "phanLoai": "Ly thuyet",
-  "tenMonHoc": "Toan cao cap 1"
-};
-
-const LichHoc = () => {
+const LichHoc = () => { 
   const navigation = useNavigation();
+  const sinhVienData = useRecoilValue(sinhVienDataState);
   const [currentDate, setCurrentDate] = useState(moment());
   const [selectedDay, setSelectedDay] = useState(null);
   const [monthModalVisible, setMonthModalVisible] = useState(false);
   const [scheduledDays, setScheduledDays] = useState({});
 
   useEffect(() => {
-    const startDate = moment(sampleData.ngayBatDau);
-    const endDate = moment(sampleData.ngayKetThuc);
-    const days = {};
+    const fetchSchedule = async () => {
+      try {
+        const data = await getLichHocByMSSV(sinhVienData.mssv); 
+        const days = {};
 
-    for (let date = startDate; date.isBefore(endDate) || date.isSame(endDate); date.add(1, 'days')) {
-      const dayOfWeek = date.isoWeekday(); // 1 (Monday) to 7 (Sunday)
-      const scheduledDay = sampleData.lichHoc.find(item => item.ngayHoc === dayOfWeek);
+        data.forEach(schedule => {
+          const startDate = moment(schedule.ngayBatDau);
+          const endDate = moment(schedule.ngayKetThuc);
 
-      if (scheduledDay) {
-        days[date.format('YYYY-MM-DD')] = {
-          subject: sampleData.tenMonHoc,
-          room: scheduledDay.phongHoc,
-          time: scheduledDay.tietHoc,
-          teacher: sampleData.GV
-        };
+          for (let date = startDate; date.isBefore(endDate) || date.isSame(endDate); date.add(1, 'days')) {
+            const dayOfWeek = date.isoWeekday(); // 1 (Monday) to 7 (Sunday)
+            const scheduledDay = schedule.lichHoc.find(item => item.ngayHoc === dayOfWeek);
+
+            if (scheduledDay) {
+              const formattedDate = date.format('YYYY-MM-DD');
+              if (!days[formattedDate]) {
+                days[formattedDate] = [];
+              }
+              days[formattedDate].push({
+                subject: schedule.tenMonHoc,
+                room: scheduledDay.phongHoc,
+                time: scheduledDay.tietHoc,
+                teacher: schedule.GV
+              });
+            }
+          }
+        });
+
+        setScheduledDays(days); // Update the state with the fetched schedule
+      } catch (error) {
+        console.error('Error fetching schedule:', error.message); // Handle error silently if you don't need UI updates
       }
-    }
+    };
 
-    setScheduledDays(days);
-  }, []);
+    fetchSchedule();
+  }, [sinhVienData.mssv]); // Re-run the effect if mssv changes
 
   const startOfWeek = currentDate.clone().startOf('isoWeek');
   const days = [];
@@ -155,11 +152,7 @@ const LichHoc = () => {
             return (
               <View style={styles.dayContainer}>
                 <TouchableOpacity 
-                  style={[
-                    styles.dayButton, 
-                    isSelected && styles.selectedDay,
-                    hasSchedule && styles.hasSchedule,
-                  ]}
+                  style={[styles.dayButton, isSelected && styles.selectedDay, hasSchedule && styles.hasSchedule]}
                   onPress={() => handleDayPress(item)}
                 >
                   <Text style={styles.dayText}>{moment(item).format('ddd')}</Text>
@@ -176,10 +169,14 @@ const LichHoc = () => {
 
       {selectedDay && (
         <View style={styles.scheduleDetails}>
-          <Text style={styles.detailText}>Môn học: {selectedDay.subject}</Text>
-          <Text style={styles.detailText}>Phòng học: {selectedDay.room}</Text>
-          <Text style={styles.detailText}>Giờ học: {selectedDay.time}</Text>
-          <Text style={styles.detailText}>Giáo viên: {selectedDay.teacher}</Text>
+          {selectedDay.map((schedule, index) => (
+            <View key={index}>
+              <Text style={styles.detailText}>Môn học: {schedule.subject}</Text>
+              <Text style={styles.detailText}>Phòng học: {schedule.room}</Text>
+              <Text style={styles.detailText}>Giờ học: {schedule.time}</Text>
+              <Text style={styles.detailText}>Giáo viên: {schedule.teacher}</Text>
+            </View>
+          ))}
         </View>
       )}
 
