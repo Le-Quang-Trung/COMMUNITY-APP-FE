@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   headerbar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: 'rgba(58, 131, 244, 0.4)',
+    backgroundColor: '#0977FE',
     padding: 10,
   },
   Headers: {

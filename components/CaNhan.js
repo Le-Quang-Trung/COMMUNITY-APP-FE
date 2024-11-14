@@ -111,12 +111,18 @@ const CaNhan = () => {
                     </>
                 )}
             </View>
+            <View style={styles.button}>
+            <TouchableOpacity style={styles.touchable} onPress={() => navigation.navigate('DoiMatKhau')}>
+                <View style={styles.buttonContainer}>
+                    <Text style={styles.buttonText}>Đổi mật khẩu</Text>
+                </View>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.touchable} onPress={handleLogout}>
                 <View style={styles.buttonContainer}>
-                    <FontAwesome name="sign-out" size={20} color="white" />
                     <Text style={styles.buttonText}>Đăng xuất</Text>
                 </View>
             </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -170,6 +176,11 @@ const styles = StyleSheet.create({
         width: '60%',
         textAlign: 'left',
     },
+    button: {
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        flexDirection: 'row'
+    },
     touchable: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -178,8 +189,8 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: 'row',
-        width: 300,
-        height: 50,
+        width: 160,
+        height: 45,
         backgroundColor: 'rgba(58, 131, 244, 0.4)',
         alignItems: 'center',
         justifyContent: 'center',
@@ -188,7 +199,6 @@ const styles = StyleSheet.create({
     buttonText: {
         fontWeight: 'bold',
         fontSize: 18,
-        left: 10,
         color: 'white',
     },
 });

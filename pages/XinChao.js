@@ -17,7 +17,7 @@ const XinChao = () => {
             </TouchableOpacity>
 
 
-            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('TraCuu')}>
+            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('TraCuuThongTin')}>
                 <Text style={styles.optionText}>Phụ huynh</Text>
                 <Image source={require('../assets/images/parents-vector.png')} style={styles.optionImage} />
             </TouchableOpacity>

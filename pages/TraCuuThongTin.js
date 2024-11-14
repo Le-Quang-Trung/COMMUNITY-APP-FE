@@ -1,21 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, TextInput, Image, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { loginSinhVien } from '../service/taikhoan.service';
+import { useSetRecoilState } from 'recoil';
+import { userPHState } from '../state';
 
 const TraCuuThongTin = () => {
     const navigation = useNavigation();
-    const [maSinhVien, setMaSinhVien] = useState('');
-    const [hoTen, setHoTen] = useState('');
-    const [ngaySinh, setNgaySinh] = useState('');
-    const [soDienThoai, setSoDienThoai] = useState('');
-    const [error, setError] = useState('');
 
-    const handleTraCuu = () => {
-        if (!maSinhVien || !hoTen || !ngaySinh || !soDienThoai) {
-            setError('Vui lòng điền đầy đủ thông tin các trường bắt buộc');
-        } else {
-            setError('');
-            navigation.navigate('TabScreen');
+    // Khai báo các state để lưu thông tin đăng nhập
+    const setUserPHState = useSetRecoilState(userPHState);
+    const [tenTaiKhoan, setTenTaiKhoan] = useState('');
+    const [matKhau, setMatKhau] = useState('');
+
+    // Hàm handleTraCuu điều chỉnh để gọi API
+    const handleTraCuu = async () => {
+        try {
+            userData = await loginSinhVien.loginSV(tenTaiKhoan, matKhau);
+            console.log('User data:', userData);
+            setUserPHState(userData);
+            navigation.navigate('TraCuu');
+        } catch (error) {
+            Alert.alert('Lỗi', error.message);
         }
     };
 
@@ -36,48 +42,23 @@ const TraCuuThongTin = () => {
                     <View style={styles.inputLabelContainer}>
                         <TextInput
                             style={styles.inputContainer}
-                            placeholder='Nhập mã sinh viên'
+                            placeholder={`Nhập mã sinh viên`}
                             placeholderTextColor={'gray'}
-                            value={maSinhVien}
-                            onChangeText={setMaSinhVien}
+                            value={tenTaiKhoan}
+                            onChangeText={setTenTaiKhoan} // Cập nhật state khi người dùng nhập
                         />
-                        <Text style={styles.required}>(*)</Text>
                     </View>
 
                     <View style={styles.inputLabelContainer}>
                         <TextInput
                             style={styles.inputContainer}
-                            placeholder='Nhập họ và tên'
+                            placeholder='Nhập mật khẩu'
                             placeholderTextColor={'gray'}
-                            value={hoTen}
-                            onChangeText={setHoTen}
+                            secureTextEntry
+                            value={matKhau}
+                            onChangeText={setMatKhau} // Cập nhật state khi người dùng nhập
                         />
-                        <Text style={styles.required}>(*)</Text>
                     </View>
-
-                    <View style={styles.inputLabelContainer}>
-                        <TextInput
-                            style={styles.inputContainer}
-                            placeholder='VD: 01/01/1998'
-                            placeholderTextColor={'gray'}
-                            value={ngaySinh}
-                            onChangeText={setNgaySinh}
-                        />
-                        <Text style={styles.required}>(*)</Text>
-                    </View>
-
-                    <View style={styles.inputLabelContainer}>
-                        <TextInput
-                            style={styles.inputContainer}
-                            placeholder='Nhập số điện thoại'
-                            placeholderTextColor={'gray'}
-                            value={soDienThoai}
-                            onChangeText={setSoDienThoai}
-                        />
-                        <Text style={styles.required}>(*)</Text>
-                    </View>
-
-                    {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={handleTraCuu}>
@@ -149,10 +130,6 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 20,
         flex: 1,
-    },
-    required: {
-        color: 'red',
-        marginLeft: 8,
     },
     buttonContainer: {
         width: '100%',

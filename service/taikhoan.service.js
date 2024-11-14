@@ -72,4 +72,30 @@ export const logout = async (tenTaiKhoan) => {
     }
 };
 
+export const changePassword = async (id, lastPassword, newPassword) => {
+    try {
+        const response = await fetch(`${host}/taikhoan/changePassword/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                lastpassword: lastPassword,
+                newpassword: newPassword,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to change password');
+        }
+
+        const updatedAccount = await response.json();
+        return updatedAccount;
+    } catch (error) {
+        console.error('Error changing password:', error.message);
+        throw error;
+    }
+};
+
 

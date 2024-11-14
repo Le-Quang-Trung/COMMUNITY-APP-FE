@@ -1,17 +1,42 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { getSinhVienByMSSV } from '../service/sinhvien.service';
+import { userPHState, sinhVienDataState } from '../state';
 
 const TraCuu = () => {
+
+    const userPH = useRecoilValue(userPHState);
+    const sinhVienData = useRecoilValue(sinhVienDataState);
+    const setSinhVienData = useSetRecoilState(sinhVienDataState);
+
     const navigation = useNavigation();
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const sinhVienData = await getSinhVienByMSSV(userPH.tenTaiKhoan);
+                setSinhVienData(sinhVienData);
+            } catch (error) {
+                console.error('Lỗi khi lấy thông tin người dùng:', error);
+                Alert.alert("Lỗi", "Không thể lấy thông tin người dùng");
+            }
+        };
+
+        fetchUserData();
+    }, [userPH.tenTaiKhoan, setSinhVienData]);
 
     return (
         <View style={styles.Container}>
-            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('TraCuuThongTin')}>
-                <Text style={styles.optionText}>Tra cứu thông tin</Text>
+            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('DiemHocKy')}>
+                <Text style={styles.optionText}>Xem điểm</Text>
                 <Image source={require('../assets/images/tra-cuu-thong-tin.png')} style={styles.optionImage} />
             </TouchableOpacity>
-
+            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('LichHoc')}>
+                <Text style={styles.optionText}>Xem lịch học/lịch thi</Text>
+                <Image source={require('../assets/images/tra-cuu-thong-tin.png')} style={styles.optionImage} />
+            </TouchableOpacity>
             <TouchableOpacity style={styles.optionContainer}>
                 <Text style={styles.optionText}>Thanh toán học phí</Text>
                 <Image source={require('../assets/images/thanh-toan-hoc-phi.png')} style={styles.optionImage} />

@@ -8,6 +8,11 @@ export const userState = atom({
     },
 });
 
+export const userPHState = atom({
+    key: 'userPHState',
+    default: null,
+})
+
 export const sinhVienDataState = atom({
     key: 'sinhVienDataState',
     default: null,
