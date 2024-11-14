@@ -1,31 +1,16 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { getSinhVienByMSSV } from '../service/sinhvien.service';
-import { userPHState, sinhVienDataState } from '../state';
+import { useRecoilValue } from 'recoil';
+import { sinhVienDataState } from '../state';
 
 const TraCuu = () => {
 
-    const userPH = useRecoilValue(userPHState);
     const sinhVienData = useRecoilValue(sinhVienDataState);
-    const setSinhVienData = useSetRecoilState(sinhVienDataState);
+
+    console.log("dữ liệu sinh viên:",sinhVienData);
 
     const navigation = useNavigation();
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const sinhVienData = await getSinhVienByMSSV(userPH.tenTaiKhoan);
-                setSinhVienData(sinhVienData);
-            } catch (error) {
-                console.error('Lỗi khi lấy thông tin người dùng:', error);
-                Alert.alert("Lỗi", "Không thể lấy thông tin người dùng");
-            }
-        };
-
-        fetchUserData();
-    }, [userPH.tenTaiKhoan, setSinhVienData]);
 
     return (
         <View style={styles.Container}>

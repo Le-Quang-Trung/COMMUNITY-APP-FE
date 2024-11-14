@@ -1,27 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Text, View, TouchableOpacity, TextInput, Image, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { loginSinhVien } from '../service/taikhoan.service';
+import { getSinhVienByPhuHuynh } from "../service/sinhvien.service";
 import { useSetRecoilState } from 'recoil';
-import { userPHState } from '../state';
+import { sinhVienDataState } from '../state';
 
 const TraCuuThongTin = () => {
     const navigation = useNavigation();
+    const [maSinhVien, setMaSinhVien] = useState('');
+    const [hoTen, setHoTen] = useState('');
+    const [ngaySinh, setNgaySinh] = useState('');
+    const [soDienThoai, setSoDienThoai] = useState('');
+    const [error, setError] = useState('');
+    const setSinhVienData = useSetRecoilState(sinhVienDataState);
 
-    // Khai báo các state để lưu thông tin đăng nhập
-    const setUserPHState = useSetRecoilState(userPHState);
-    const [tenTaiKhoan, setTenTaiKhoan] = useState('');
-    const [matKhau, setMatKhau] = useState('');
-
-    // Hàm handleTraCuu điều chỉnh để gọi API
     const handleTraCuu = async () => {
-        try {
-            userData = await loginSinhVien.loginSV(tenTaiKhoan, matKhau);
-            console.log('User data:', userData);
-            setUserPHState(userData);
-            navigation.navigate('TraCuu');
-        } catch (error) {
-            Alert.alert('Lỗi', error.message);
+        if (!maSinhVien || !hoTen || !ngaySinh || !soDienThoai) {
+            setError('Vui lòng điền đầy đủ thông tin các trường bắt buộc');
+        } else {
+            try {
+                setError('');
+                const data = await getSinhVienByPhuHuynh(maSinhVien, hoTen, ngaySinh, soDienThoai);
+                setSinhVienData(data); // Lưu vào Recoil state
+                navigation.navigate('TraCuu'); // Chuyển hướng sau khi tìm kiếm thành công
+            } catch (error) {
+                setError('Không tìm thấy thông tin sinh viên');
+                console.error('Error fetching SinhVien:', error);
+            }
         }
     };
 
@@ -31,35 +36,53 @@ const TraCuuThongTin = () => {
             <View style={styles.imageContainer}>
                 <Image source={require('../assets/images/iuh_logo.png')} style={styles.optionImage} />
             </View>
-
             <View style={styles.titleLogin}>
                 <Text style={styles.login}>Tra cứu thông tin</Text>
             </View>
-
             {/* form */}
             <View style={styles.titleContainer}>
                 <View style={styles.containerForm}>
                     <View style={styles.inputLabelContainer}>
                         <TextInput
                             style={styles.inputContainer}
-                            placeholder={`Nhập mã sinh viên`}
+                            placeholder='Nhập mã sinh viên'
                             placeholderTextColor={'gray'}
-                            value={tenTaiKhoan}
-                            onChangeText={setTenTaiKhoan} // Cập nhật state khi người dùng nhập
+                            value={maSinhVien}
+                            onChangeText={setMaSinhVien}
                         />
+                        <Text style={styles.required}>(*)</Text>
                     </View>
-
                     <View style={styles.inputLabelContainer}>
                         <TextInput
                             style={styles.inputContainer}
-                            placeholder='Nhập mật khẩu'
+                            placeholder='Nhập họ và tên'
                             placeholderTextColor={'gray'}
-                            secureTextEntry
-                            value={matKhau}
-                            onChangeText={setMatKhau} // Cập nhật state khi người dùng nhập
+                            value={hoTen}
+                            onChangeText={setHoTen}
                         />
+                        <Text style={styles.required}>(*)</Text>
                     </View>
-
+                    <View style={styles.inputLabelContainer}>
+                        <TextInput
+                            style={styles.inputContainer}
+                            placeholder='01/01/1998'
+                            placeholderTextColor={'gray'}
+                            value={ngaySinh}
+                            onChangeText={setNgaySinh}
+                        />
+                        <Text style={styles.required}>(*)</Text>
+                    </View>
+                    <View style={styles.inputLabelContainer}>
+                        <TextInput
+                            style={styles.inputContainer}
+                            placeholder='Nhập số điện thoại'
+                            placeholderTextColor={'gray'}
+                            value={soDienThoai}
+                            onChangeText={setSoDienThoai}
+                        />
+                        <Text style={styles.required}>(*)</Text>
+                    </View>
+                    {error ? <Text style={styles.errorText}>{error}</Text> : null}
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={handleTraCuu}>
                             <Text style={styles.buttonText}>Tra cứu</Text>
@@ -130,6 +153,10 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 20,
         flex: 1,
+    },
+    required: {
+        color: 'red',
+        marginLeft: 8,
     },
     buttonContainer: {
         width: '100%',
