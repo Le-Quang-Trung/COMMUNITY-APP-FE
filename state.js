@@ -17,3 +17,8 @@ export const giangVienDataState = atom({
     key: 'giangVienDataState',
     default: null,
 })
+
+export const quanLyDataState = atom ({
+    key: 'quanLyDataState',
+    default: null,
+})

@@ -9,8 +9,8 @@ export const getGiangVienByMaGV = async (maGV) => {
             throw new Error("Lỗi: Không tìm thấy giảng viên với maGV đã cho");
         }
 
-        const sinhvienData = await response.json();
-        return sinhvienData;
+        const giangvienData = await response.json();
+        return giangvienData;
     } catch (error) {
         console.error('Lỗi khi lấy thông tin giảng viên:', error);
         throw error;

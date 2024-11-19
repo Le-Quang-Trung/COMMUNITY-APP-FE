@@ -27,7 +27,7 @@ const DangNhap = ({ route }) => {
             let userData;
             if (role === 'sinh viên') {
                 userData = await loginSinhVien.loginSV(tenTaiKhoan, matKhau);
-            } else if (role === 'giảng viên') {
+            } else if (role === 'giảng viên' || role === 'quản lý') {
                 userData = await loginGiangVien.loginGV(tenTaiKhoan, matKhau);
             }
             console.log('User data:', userData);

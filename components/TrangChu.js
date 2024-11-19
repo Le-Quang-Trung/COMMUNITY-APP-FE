@@ -7,14 +7,17 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { getLichHocByMSSV } from '../service/lichhoclichthi.service';
 import { getSinhVienByMSSV } from '../service/sinhvien.service';
 import { getGiangVienByMaGV } from '../service/giangvien.service';
-import { userState, sinhVienDataState, giangVienDataState } from '../state';
+import { getQuanLyByMaQL } from '../service/quanly.service';
+import { userState, sinhVienDataState, giangVienDataState, quanLyDataState } from '../state';
 
 const TrangChu = () => {
     const user = useRecoilValue(userState);
     const sinhVienData = useRecoilValue(sinhVienDataState);
     const giangVienData = useRecoilValue(giangVienDataState);
+    const quanLyData = useRecoilValue(quanLyDataState);
     const setSinhVienData = useSetRecoilState(sinhVienDataState);
     const setGiangVienData = useSetRecoilState(giangVienDataState);
+    const setQuanLyData = useSetRecoilState(quanLyDataState);
     const navigation = useNavigation();
     const [todaySchedule, setTodaySchedule] = useState(null);
 
@@ -28,6 +31,9 @@ const TrangChu = () => {
                 } else if (user.role === 'giảng viên') {
                     const giangVienData = await getGiangVienByMaGV(user.data.tenTaiKhoan);
                     setGiangVienData(giangVienData); // Cập nhật thông tin giảng viên vào Recoil
+                } else if (user.role === 'quản lý') {
+                    const quanLyData = await getQuanLyByMaQL(user.data.tenTaiKhoan);
+                    setQuanLyData(quanLyData); // Cập nhật thông tin quản lý vào Recoil
                 }
             } catch (error) {
                 console.error('Lỗi khi lấy thông tin người dùng:', error);
@@ -69,7 +75,7 @@ const TrangChu = () => {
             <View style={styles.header}>
                 <View style={styles.headerTop}>
                     <Text style={styles.headerText}>
-                        Xin chào, {user.role === 'sinh viên' ? sinhVienData?.hoTen : giangVienData?.tenGV}
+                        Xin chào, {user.role === 'sinh viên' ? sinhVienData?.hoTen : user.role === 'giảng viên' ? giangVienData?.tenGV : 'Người Quản Lý'}
                     </Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Thông Báo')}>
                         <FontAwesome name="bell" size={24} color="white" />
@@ -121,6 +127,20 @@ const TrangChu = () => {
                     </View>
                 </>
             )}
+
+            {user.role === 'quản lý' && (
+                <>
+                    <Text style={styles.functionsTitle}>Chức năng</Text>
+                    <View style={styles.functionsContainer}>
+                        {functionsDataQL.map((item, index) => (
+                            <TouchableOpacity key={index} style={styles.functionItem} onPress={() => navigation.navigate(item.navigateTo)}>
+                                <View style={styles.iconContainer}>{item.iconComponent()}</View>
+                                <Text style={styles.functionText}>{item.title}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </>
+            )}
         </View>
     );
 };
@@ -138,10 +158,16 @@ const functionsDataSV = [
 
 // Thông tin các chức năng
 const functionsDataGV = [
-    { title: 'Tạo điểm', iconComponent: () => <Ionicons name="book-outline" size={40} color="green" />, navigateTo: '' },
-    { title: 'Cập nhật điểm số', iconComponent: () => <Ionicons name="cash-outline" size={40} color="blue" />, navigateTo: '' },
+    { title: 'Tạo điểm', iconComponent: () => <Ionicons name="document-text-outline" size={40} color="green" />, navigateTo: '' },
+    { title: 'Cập nhật điểm số', iconComponent: () => <Ionicons name="document-text" size={40} color="blue" />, navigateTo: '' },
     { title: 'Xem thông tin lớp học', iconComponent: () => <Ionicons name="calendar-outline" size={40} color="orange" />, navigateTo: 'LichHoc' },
     { title: 'Thông báo', iconComponent: () => <Ionicons name="notifications-outline" size={40} color="red" />, navigateTo: 'Thông Báo' },
+];
+
+// Thông tin các chức năng
+const functionsDataQL = [
+    { title: 'Thông tin sinh viên', iconComponent: () => <Ionicons name="apps" size={40} color="blue" />, navigateTo: '' },
+    { title: 'Tạo tài khoản cho sinh viên', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="orange" />, navigateTo: '' },
 ];
 
 export default TrangChu;

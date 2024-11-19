@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { logout } from '../service/taikhoan.service';
 import { useRecoilValue } from 'recoil';
-import { giangVienDataState, sinhVienDataState, userState } from '../state';
+import { giangVienDataState, sinhVienDataState, quanLyDataState, userState } from '../state';
 
 const CaNhan = () => {
     const user = useRecoilValue(userState);
@@ -13,6 +13,8 @@ const CaNhan = () => {
     console.log("đây là dữ liệu sinh viên:", sinhVienData);
     const giangVienData = useRecoilValue(giangVienDataState);
     console.log("đây là dữ liệu giảng viên:", giangVienData);
+    const quanLyData = useRecoilValue(quanLyDataState);
+    console.log("đây là dữ liệu quản lý:", quanLyData);
     const navigation = useNavigation();
 
 
@@ -44,7 +46,7 @@ const CaNhan = () => {
                     // source={{ uri: sinhVienData.hinhAnh }}
                     source={require('../assets/images/parents-vector.png')}
                 />
-                <Text style={styles.name}>{role === 'sinh viên' ? sinhVienData.hoTen : giangVienData.tenGV}</Text>
+                <Text style={styles.name}>{role === 'sinh viên' ? sinhVienData.hoTen : role === 'giảng viên' ? giangVienData.tenGV : 'Quản Lý'}</Text>
             </View>
 
             <View style={styles.infoContainer}>
@@ -92,9 +94,8 @@ const CaNhan = () => {
                         </View>
 
                     </>
-                ) : (
+                ) : role === 'giảng viên' ? (
                     <>
-
                         <View style={styles.infoRow}>
                             <Text style={styles.label}>Mã Giảng Viên:</Text>
                             <Text style={styles.value}>{giangVienData.maGV}</Text>
@@ -107,21 +108,27 @@ const CaNhan = () => {
                             <Text style={styles.label}>Địa chỉ:</Text>
                             <Text style={styles.value}>{giangVienData.diaChi}</Text>
                         </View>
-
                     </>
-                )}
+                ) : role === 'quản lý' ? (
+                    <>
+                        <View style={styles.infoRow}>
+                            <Text style={styles.label}>Mã Quản Lý:</Text>
+                            <Text style={styles.value}>{quanLyData.maQL}</Text>
+                        </View>
+                    </>
+                ): null}
             </View>
             <View style={styles.button}>
-            <TouchableOpacity style={styles.touchable} onPress={() => navigation.navigate('DoiMatKhau')}>
-                <View style={styles.buttonContainer}>
-                    <Text style={styles.buttonText}>Đổi mật khẩu</Text>
-                </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.touchable} onPress={handleLogout}>
-                <View style={styles.buttonContainer}>
-                    <Text style={styles.buttonText}>Đăng xuất</Text>
-                </View>
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.touchable} onPress={() => navigation.navigate('DoiMatKhau')}>
+                    <View style={styles.buttonContainer}>
+                        <Text style={styles.buttonText}>Đổi mật khẩu</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.touchable} onPress={handleLogout}>
+                    <View style={styles.buttonContainer}>
+                        <Text style={styles.buttonText}>Đăng xuất</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         </View>
     );
