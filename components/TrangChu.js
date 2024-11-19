@@ -167,7 +167,7 @@ const functionsDataGV = [
 // Thông tin các chức năng
 const functionsDataQL = [
     { title: 'Thông tin sinh viên', iconComponent: () => <Ionicons name="apps" size={40} color="blue" />, navigateTo: '' },
-    { title: 'Tạo tài khoản cho sinh viên', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="orange" />, navigateTo: '' },
+    { title: 'Tạo tài khoản cho sinh viên', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="orange" />, navigateTo: 'TaoTaiKhoan' },
 ];
 
 export default TrangChu;

@@ -22,6 +22,7 @@ import PhieuThu from "../pages/PhieuThu";
 import TraCuuThongTin from "../pages/TraCuuThongTin.js";
 
 import DoiMatKhau from "../pages/DoiMatKhau.js";
+import TaoTaiKhoan from "../pages/TaoTaiKhoan.js";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -144,6 +145,7 @@ const Navigation = () => {
         <Stack.Screen name="CongNo" component={CongNo} options={{ headerShown: false }}/>
         <Stack.Screen name="PhieuThu" component={PhieuThu} options={{ headerShown: false }}/>
         <Stack.Screen name="DoiMatKhau" component={DoiMatKhau} options={{headerShown: false}}/>
+        <Stack.Screen name="TaoTaiKhoan" component={TaoTaiKhoan} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

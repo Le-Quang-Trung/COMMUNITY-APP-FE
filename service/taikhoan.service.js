@@ -98,4 +98,26 @@ export const changePassword = async (id, lastPassword, newPassword) => {
     }
 };
 
+export const createAccount = async (tenTaiKhoan, matKhau) => {
+    try {
+        const response = await fetch(`${host}/taikhoan/taotaikhoan`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ tenTaiKhoan, matKhau }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Có lỗi xảy ra.');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Lỗi khi tạo tài khoản:', error.message);
+        throw error;
+    }
+};
+
 
