@@ -5,10 +5,11 @@ import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
 import { getLichHocByMSSV } from '../service/lichhoclichthi.service';
 import { useRecoilValue } from 'recoil';
-import { sinhVienDataState } from '../state';
+import { sinhVienDataState, userState } from '../state';
 
 const LichHocLichThi = () => { 
   const navigation = useNavigation();
+  const user = useRecoilValue(userState);
   const sinhVienData = useRecoilValue(sinhVienDataState);
   const [currentDate, setCurrentDate] = useState(moment());
   const [selectedDay, setSelectedDay] = useState(null);
@@ -17,18 +18,23 @@ const LichHocLichThi = () => {
 
   useEffect(() => {
     const fetchSchedule = async () => {
+      if (user.role !== 'sinh viên') {
+        console.warn('Chỉ sinh viên mới có quyền xem lịch học.');
+        return; // Dừng nếu không phải sinh viên
+      }
+  
       try {
         const data = await getLichHocByMSSV(sinhVienData.mssv); 
         const days = {};
-
+  
         data.forEach(schedule => {
           const startDate = moment(schedule.ngayBatDau);
           const endDate = moment(schedule.ngayKetThuc);
-
+  
           for (let date = startDate; date.isBefore(endDate) || date.isSame(endDate); date.add(1, 'days')) {
             const dayOfWeek = date.isoWeekday(); // 1 (Monday) to 7 (Sunday)
             const scheduledDay = schedule.lichHoc.find(item => item.ngayHoc === dayOfWeek);
-
+  
             if (scheduledDay) {
               const formattedDate = date.format('YYYY-MM-DD');
               if (!days[formattedDate]) {
@@ -43,15 +49,16 @@ const LichHocLichThi = () => {
             }
           }
         });
-
+  
         setScheduledDays(days); // Update the state with the fetched schedule
       } catch (error) {
         console.error('Error fetching schedule:', error.message); // Handle error silently if you don't need UI updates
       }
     };
-
+  
     fetchSchedule();
-  }, [sinhVienData.mssv]); // Re-run the effect if mssv changes
+  }, [user.role, sinhVienData.mssv]); // Re-run the effect if role or mssv changes
+  
 
   const startOfWeek = currentDate.clone().startOf('isoWeek');
   const days = [];

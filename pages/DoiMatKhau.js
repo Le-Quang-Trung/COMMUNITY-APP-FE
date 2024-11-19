@@ -59,6 +59,7 @@ const DoiMatKhau = () => {
                     style={[styles.input, styles.inputBorder]}
                     value={lastPassword}
                     onChangeText={setLastPassword}
+                    secureTextEntry={true}
                 />
             </View>
 
@@ -72,6 +73,7 @@ const DoiMatKhau = () => {
                     style={[styles.input, styles.inputBorder]}
                     value={newPassword}
                     onChangeText={setNewPassword}
+                    secureTextEntry={true}
                 />
             </View>
 
@@ -85,6 +87,7 @@ const DoiMatKhau = () => {
                     style={[styles.input, styles.inputBorder]}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
+                    secureTextEntry={true}
                 />
             </View>
             <View style={styles.buttonContainer}>

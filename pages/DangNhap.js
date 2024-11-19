@@ -6,6 +6,7 @@ import { TouchableOpacity } from 'react-native';
 import { loginSinhVien, loginGiangVien } from '../service/taikhoan.service';
 import { useSetRecoilState } from 'recoil';
 import { userState } from '../state';
+import { AntDesign } from '@expo/vector-icons'; // Import icon thư viện
 
 const DangNhap = ({ route }) => {
     const { role } = route.params; // Lấy vai trò từ route params
@@ -16,8 +17,12 @@ const DangNhap = ({ route }) => {
     const [tenTaiKhoan, setTenTaiKhoan] = useState('');
     const [matKhau, setMatKhau] = useState('');
 
-     // Hàm handleLogin điều chỉnh để gọi API đúng dựa vào role
-     const handleLogin = async () => {
+    // State quản lý ẩn/hiện mật khẩu
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+
+    // Hàm handleLogin điều chỉnh để gọi API đúng dựa vào role
+    const handleLogin = async () => {
         try {
             let userData;
             if (role === 'sinh viên') {
@@ -25,12 +30,12 @@ const DangNhap = ({ route }) => {
             } else if (role === 'giảng viên') {
                 userData = await loginGiangVien.loginGV(tenTaiKhoan, matKhau);
             }
-            console.log('User data:', userData); 
+            console.log('User data:', userData);
 
             setUserState({ role, data: userData });
-            navigation.navigate('TabScreen'); 
+            navigation.navigate('TabScreen');
         } catch (error) {
-            Alert.alert('Lỗi', error.message); 
+            Alert.alert('Lỗi', error.message);
         }
     };
 
@@ -61,13 +66,26 @@ const DangNhap = ({ route }) => {
                         />
                     </View>
                     <View style={styles.inputContainer}>
-                        <TextInput
-                            placeholder='Nhập mật khẩu'
-                            placeholderTextColor={'gray'}
-                            secureTextEntry
-                            value={matKhau}
-                            onChangeText={setMatKhau} // Cập nhật state khi người dùng nhập
-                        />
+                        <View style={styles.passwordContainer}>
+                            <TextInput
+                                placeholder='Nhập mật khẩu'
+                                placeholderTextColor={'gray'}
+                                secureTextEntry={!isPasswordVisible} // Dùng trạng thái để ẩn/hiện
+                                value={matKhau}
+                                onChangeText={setMatKhau}
+                                style={styles.passwordInput}
+                            />
+                            <TouchableOpacity
+                                onPress={() => setIsPasswordVisible(!isPasswordVisible)} // Toggle trạng thái
+                            >
+                                <AntDesign
+                                    name={isPasswordVisible ? 'eyeo' : 'eye'}
+                                    size={25}
+                                    color="gray"
+                                    style={styles.eyeIcon}
+                                />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -138,6 +156,16 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         width: '100%',
         marginBottom: 13,
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    passwordInput: {
+        flex: 1,
+    },
+    eyeIcon: {
+        marginLeft: 10,
     },
     buttonContainer: {
         width: '100%',

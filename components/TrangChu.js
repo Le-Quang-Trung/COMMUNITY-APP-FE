@@ -16,7 +16,7 @@ const TrangChu = () => {
     const setSinhVienData = useSetRecoilState(sinhVienDataState);
     const setGiangVienData = useSetRecoilState(giangVienDataState);
     const navigation = useNavigation();
-    const [todaySchedule, setTodaySchedule] = useState(null); 
+    const [todaySchedule, setTodaySchedule] = useState(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -40,14 +40,14 @@ const TrangChu = () => {
 
     const fetchTodaySchedule = async (mssv) => {
         try {
-            const schedules = await getLichHocByMSSV(mssv); 
-            const today = moment(); 
-            const todayFormatted = today.format('YYYY-MM-DD'); 
+            const schedules = await getLichHocByMSSV(mssv);
+            const today = moment();
+            const todayFormatted = today.format('YYYY-MM-DD');
 
             const todayData = schedules.filter(schedule => {
                 const startDate = moment(schedule.ngayBatDau);
                 const endDate = moment(schedule.ngayKetThuc);
-    
+
                 // Kiểm tra nếu hôm nay nằm trong khoảng thời gian học
                 if (today.isBetween(startDate, endDate, 'days', '[]')) {
                     // Kiểm tra lịch học có trùng ngày trong tuần của hôm nay không
@@ -56,7 +56,7 @@ const TrangChu = () => {
                 }
                 return false;
             });
-    
+
             setTodaySchedule(todayData.length > 0 ? todayData : null); // Cập nhật state lịch hôm nay
         } catch (error) {
             console.error('Lỗi khi lấy lịch hôm nay:', error);
@@ -94,21 +94,39 @@ const TrangChu = () => {
             </View>
 
             {/* Functionalities */}
-            <Text style={styles.functionsTitle}>Chức năng</Text>
-            <View style={styles.functionsContainer}>
-                {functionsData.map((item, index) => (
-                    <TouchableOpacity key={index} style={styles.functionItem} onPress={() => navigation.navigate(item.navigateTo)}>
-                        <View style={styles.iconContainer}>{item.iconComponent()}</View>
-                        <Text style={styles.functionText}>{item.title}</Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
+            {user.role === 'sinh viên' && (
+                <>
+                    <Text style={styles.functionsTitle}>Chức năng</Text>
+                    <View style={styles.functionsContainer}>
+                        {functionsDataSV.map((item, index) => (
+                            <TouchableOpacity key={index} style={styles.functionItem} onPress={() => navigation.navigate(item.navigateTo)}>
+                                <View style={styles.iconContainer}>{item.iconComponent()}</View>
+                                <Text style={styles.functionText}>{item.title}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </>
+            )}
+
+            {user.role === 'giảng viên' && (
+                <>
+                    <Text style={styles.functionsTitle}>Chức năng</Text>
+                    <View style={styles.functionsContainer}>
+                        {functionsDataGV.map((item, index) => (
+                            <TouchableOpacity key={index} style={styles.functionItem} onPress={() => navigation.navigate(item.navigateTo)}>
+                                <View style={styles.iconContainer}>{item.iconComponent()}</View>
+                                <Text style={styles.functionText}>{item.title}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </>
+            )}
         </View>
     );
 };
 
 // Thông tin các chức năng
-const functionsData = [
+const functionsDataSV = [
     { title: 'Chương trình khung', iconComponent: () => <Ionicons name="book-outline" size={40} color="green" />, navigateTo: 'ChuongTrinhKhung' },
     { title: 'Xem điểm', iconComponent: () => <Ionicons name="cash-outline" size={40} color="blue" />, navigateTo: 'DiemHocKy' },
     { title: 'Lịch học/ lịch thi', iconComponent: () => <Ionicons name="calendar-outline" size={40} color="orange" />, navigateTo: 'LichHoc' },
@@ -116,6 +134,14 @@ const functionsData = [
     { title: 'Phiếu thu tổng hợp', iconComponent: () => <Ionicons name="file-tray-full-outline" size={40} color="lightblue" />, navigateTo: 'PhieuThu' },
     { title: 'Thanh toán học phí', iconComponent: () => <FontAwesome5 name="search-dollar" size={40} color="black" /> },
     { title: 'Công nợ', iconComponent: () => <Ionicons name="document-text-outline" size={40} color="pink" />, navigateTo: 'CongNo' },
+];
+
+// Thông tin các chức năng
+const functionsDataGV = [
+    { title: 'Tạo điểm', iconComponent: () => <Ionicons name="book-outline" size={40} color="green" />, navigateTo: '' },
+    { title: 'Cập nhật điểm số', iconComponent: () => <Ionicons name="cash-outline" size={40} color="blue" />, navigateTo: '' },
+    { title: 'Xem thông tin lớp học', iconComponent: () => <Ionicons name="calendar-outline" size={40} color="orange" />, navigateTo: 'LichHoc' },
+    { title: 'Thông báo', iconComponent: () => <Ionicons name="notifications-outline" size={40} color="red" />, navigateTo: 'Thông Báo' },
 ];
 
 export default TrangChu;
