@@ -1,25 +1,77 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getThongBaoByMSSV } from '../service/thongbao.service';
+import { useRecoilValue } from 'recoil';
+import { sinhVienDataState } from '../state';
 
 const ThongBao = () => {
     const navigation = useNavigation();
+    const sinhVienData = useRecoilValue(sinhVienDataState);
+    console.log("đây là dữ liệu sinh viên ở trang thông báo:", sinhVienData);
 
-    const notifications = [
-        { id: '1', message: 'Buổi học ngày 22 tháng 9 từ 12h30 - 15h: Đi học đúng giờ' },
-        { id: '2', message: 'Buổi học ngày 23 tháng 9 từ 14h00 - 16h30: Vắng' },
-        // Thêm các thông báo khác tương tự
-    ];
+    const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchThongBao = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const data = await getThongBaoByMSSV(sinhVienData.mssv);
+                setNotifications(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (sinhVienData.mssv) {
+            fetchThongBao();
+        }
+    }, [sinhVienData.mssv]);
+
+    if (loading) {
+        return (
+            <View style={styles.Container}>
+                <ActivityIndicator size="large" color="#0000ff" />
+                <Text>Đang tải thông báo...</Text>
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.Container}>
+                {/* <Text style={styles.errorText}>Lỗi: {error}</Text> */}
+                <Text style={styles.textHeader}>Thông Báo</Text>
+                <Text style={styles.notificationContainer}>Không có thông báo nào.</Text>
+            </View>
+        );
+    }
+
+    if (notifications.length === 0) {
+        return (
+            <View style={styles.Container}>
+                <Text style={styles.textHeader}>Thông Báo</Text>
+                <Text>Không có thông báo nào.</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.Container}>
             <Text style={styles.textHeader}>Thông Báo</Text>
             <FlatList
                 data={notifications}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
                     <View style={styles.notificationContainer}>
-                        <Text style={styles.notificationText}>{item.message}</Text>
+                        <Text style={styles.notificationTitle}>{item.tieuDe}</Text>
+                        <Text style={styles.notificationContent}>{item.noiDung}: Buổi học ngày {new Date(item.ngayGioThongBao).toLocaleDateString()}</Text>
+                        <Text style={styles.notificationFooter}>GV: {item.tenNguoiThongBao}</Text>
                     </View>
                 )}
             />
@@ -34,12 +86,11 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'rgba(58, 131, 244, 0.4)',
         padding: 20,
-        justifyContent: 'space-evenly',
     },
     textHeader: {
         fontWeight: 'bold',
         fontSize: 40,
-        marginBottom: 10,
+        marginBottom: 20,
         textAlign: 'center',
     },
     notificationContainer: {
@@ -50,8 +101,23 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         backgroundColor: '#fff',
     },
-    notificationText: {
+    notificationTitle: {
         fontSize: 18,
-        fontWeight: '500',
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    notificationContent: {
+        fontSize: 16,
+        marginBottom: 10,
+    },
+    notificationFooter: {
+        fontSize: 14,
+        fontStyle: 'italic',
+        color: '#555',
+    },
+    errorText: {
+        fontSize: 18,
+        color: 'red',
+        textAlign: 'center',
     },
 });
