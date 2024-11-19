@@ -166,7 +166,8 @@ const functionsDataGV = [
 
 // Thông tin các chức năng
 const functionsDataQL = [
-    { title: 'Thông tin sinh viên', iconComponent: () => <Ionicons name="apps" size={40} color="blue" />, navigateTo: '' },
+    { title: 'Danh sách sinh viên', iconComponent: () => <Ionicons name="duplicate-outline" size={40} color="green" />, navigateTo: 'DanhSachSinhVien' },
+    { title: 'Thông tin sinh viên', iconComponent: () => <Ionicons name="apps" size={40} color="blue" />, navigateTo: 'ThongTinSinhVien' },
     { title: 'Tạo tài khoản cho sinh viên', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="orange" />, navigateTo: 'TaoTaiKhoan' },
 ];
 
