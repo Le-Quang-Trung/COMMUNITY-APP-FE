@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import moment from 'moment';
 import { FontAwesome, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { getLichHocByMSSV } from '../service/lichhoclichthi.service';
 import { getSinhVienByMSSV } from '../service/sinhvien.service';
 import { getGiangVienByMaGV } from '../service/giangvien.service';
 import { userState, sinhVienDataState, giangVienDataState } from '../state';
@@ -12,8 +14,9 @@ const TrangChu = () => {
     const sinhVienData = useRecoilValue(sinhVienDataState);
     const giangVienData = useRecoilValue(giangVienDataState);
     const setSinhVienData = useSetRecoilState(sinhVienDataState);
-    const setGiangVienData = useSetRecoilState(giangVienDataState); 
+    const setGiangVienData = useSetRecoilState(giangVienDataState);
     const navigation = useNavigation();
+    const [todaySchedule, setTodaySchedule] = useState(null); 
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -21,6 +24,7 @@ const TrangChu = () => {
                 if (user.role === 'sinh viên') {
                     const sinhVienData = await getSinhVienByMSSV(user.data.tenTaiKhoan);
                     setSinhVienData(sinhVienData); // Cập nhật thông tin sinh viên vào Recoil
+                    fetchTodaySchedule(sinhVienData.mssv); // Gọi hàm lấy lịch hôm nay
                 } else if (user.role === 'giảng viên') {
                     const giangVienData = await getGiangVienByMaGV(user.data.tenTaiKhoan);
                     setGiangVienData(giangVienData); // Cập nhật thông tin giảng viên vào Recoil
@@ -33,6 +37,31 @@ const TrangChu = () => {
 
         fetchUserData();
     }, [user.role, user.data.tenTaiKhoan, setSinhVienData, setGiangVienData]);
+
+    const fetchTodaySchedule = async (mssv) => {
+        try {
+            const schedules = await getLichHocByMSSV(mssv); 
+            const today = moment(); 
+            const todayFormatted = today.format('YYYY-MM-DD'); 
+
+            const todayData = schedules.filter(schedule => {
+                const startDate = moment(schedule.ngayBatDau);
+                const endDate = moment(schedule.ngayKetThuc);
+    
+                // Kiểm tra nếu hôm nay nằm trong khoảng thời gian học
+                if (today.isBetween(startDate, endDate, 'days', '[]')) {
+                    // Kiểm tra lịch học có trùng ngày trong tuần của hôm nay không
+                    const dayOfWeek = today.isoWeekday(); // 1 (Thứ 2) -> 7 (Chủ nhật)
+                    return schedule.lichHoc.some(lich => lich.ngayHoc === dayOfWeek);
+                }
+                return false;
+            });
+    
+            setTodaySchedule(todayData.length > 0 ? todayData : null); // Cập nhật state lịch hôm nay
+        } catch (error) {
+            console.error('Lỗi khi lấy lịch hôm nay:', error);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -55,7 +84,11 @@ const TrangChu = () => {
                     />
                     <View>
                         <Text style={styles.scheduleTitle}>Lịch hôm nay:</Text>
-                        <Text style={styles.scheduleContent}>Không tìm thấy lịch học/lịch thi</Text>
+                        <Text style={styles.scheduleContent}>
+                            {todaySchedule
+                                ? `Bạn có ${todaySchedule.length} lịch học hôm nay`
+                                : 'Không tìm thấy lịch học/lịch thi'}
+                        </Text>
                     </View>
                 </TouchableOpacity>
             </View>
