@@ -2,71 +2,75 @@ import React, { useState } from "react";
 import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { createLopHocPhan, addSinhVienToLopHocPhan } from "../service/quanly.service"; 
+import { createLichHoc } from "../service/quanly.service";
 
-const TaoLopHocPhan = () => {
+const TaoLichHoc = () => {
     const navigation = useNavigation();
 
-    // State variables to hold the form data
-    const [tenLop, setTenLop] = useState('');
+    const [maLHP, setMaLHP] = useState('');
     const [maMonHoc, setMaMonHoc] = useState('');
-    const [nganh, setNganh] = useState('');
-    const [HK, setHK] = useState('');
-    const [Nam, setNam] = useState('');
+    const [ngayBatDau, setNgayBatDau] = useState('');
+    const [ngayKetThuc, setNgayKetThuc] = useState('');
     const [GV, setGV] = useState('');
-    const [maSinhViens, setMaSinhViens] = useState([]); 
+    const [phanLoai, setPhanLoai] = useState('');
+    const [lichHoc, setLichHoc] = useState([]);
 
-    // Function to handle form submission for creating a class
-    const handleTaoLopHocPhan = async () => {
-        // Check if all fields are filled
-        if (tenLop === '' || maMonHoc === '' || nganh === '' || HK === '' || Nam === '' || GV === '') {
+    const handleCreateLichHoc = async () => {
+        if (lichHoc === '' || maLHP === '' || maMonHoc === '' || ngayBatDau === '' || ngayKetThuc === '' || GV === '' || phanLoai === '') {
             Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
             return;
         }
-
-        const lopHocPhanData = { tenLop, maMonHoc, nganh, HK, Nam, GV };
-
+    
+        // Xử lý dữ liệu `lichHoc`
+        const parsedLichHoc = lichHoc.split(',').map((item) => {
+            const [ngayHoc, tietHoc, phongHoc] = item.split(':');
+            return { ngayHoc: parseInt(ngayHoc), tietHoc, phongHoc };
+        });
+    
+        const data = {
+            maLHP,
+            maMonHoc,
+            lichHoc: parsedLichHoc,
+            ngayBatDau,
+            ngayKetThuc,
+            GV,
+            phanLoai,
+        };
+    
         try {
-            // Call the API to create LopHocPhan
-            const result = await createLopHocPhan(lopHocPhanData);
-            Alert.alert("Thành công", "Tạo lớp học phần thành công");
-
-            // After class creation, add students to the class
-            if (maSinhViens.length > 0) {
-                const addResult = await addSinhVienToLopHocPhan(result.maLHP, maSinhViens);
-                Alert.alert("Thành công", "Thêm sinh viên vào lớp học phần thành công");
-            }
-
-            navigation.goBack(); // Go back to the previous screen
+            const result = await createLichHoc(data);
+            Alert.alert('Thành công', 'Tạo lịch học thành công!');
+            console.log('Lịch học đã tạo:', result);
+            navigation.goBack(); 
         } catch (error) {
-            Alert.alert("Lỗi", error.message);
+            Alert.alert('Lỗi', error.message);
         }
     };
-
+    
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <AntDesign 
-                    name="arrowleft" 
-                    size={22} 
-                    color="white" 
-                    onPress={() => navigation.goBack()} 
-                    style={styles.searchIcon} 
+                <AntDesign
+                    name="arrowleft"
+                    size={22}
+                    color="white"
+                    onPress={() => navigation.goBack()}
+                    style={styles.searchIcon}
                 />
-                <Text style={styles.title}>Tạo Lớp Học Phần</Text>
+                <Text style={styles.title}>Tạo Lịch Học</Text>
             </View>
 
-            {/* Ten Lop */}
+            {/* Ma Lop Hoc Phan*/}
             <View style={styles.row}>
-                <Text style={styles.label}>Tên Lớp:</Text>
+                <Text style={styles.label}>Mã Lớp Học Phần:</Text>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập tên lớp học" 
+                <TextInput
+                    placeholder="Nhập tên lớp học"
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    value={tenLop}
-                    onChangeText={setTenLop}
+                    value={maLHP}
+                    onChangeText={setMaLHP}
                 />
             </View>
 
@@ -75,8 +79,8 @@ const TaoLopHocPhan = () => {
                 <Text style={styles.label}>Mã Môn Học:</Text>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập mã môn học" 
+                <TextInput
+                    placeholder="Nhập mã môn học"
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
                     value={maMonHoc}
@@ -84,45 +88,45 @@ const TaoLopHocPhan = () => {
                 />
             </View>
 
-            {/* Nganh */}
+            {/* Lich Hoc */}
             <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Ngành:</Text>
+                <Text style={styles.label}>Lịch Học:</Text>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập ngành" 
+                <TextInput
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    value={nganh}
-                    onChangeText={setNganh}
+                    placeholder="ngayHoc: ;tietHoc: ;phongHoc:"
+                    value={lichHoc}
+                    onChangeText={setLichHoc}
                 />
             </View>
 
-            {/* HK */}
+            {/* Ngay Bat Dau */}
             <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Học Kỳ:</Text>
+                <Text style={styles.label}>Ngày Bắt Đầu:</Text>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập học kỳ (1, 2, 3)" 
+                <TextInput
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    value={HK}
-                    onChangeText={setHK}
+                    placeholder="YYYY-MM-DD"
+                    value={ngayBatDau}
+                    onChangeText={setNgayBatDau}
                 />
             </View>
 
-            {/* Nam */}
+            {/* Ngay Ket Thuc */}
             <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Năm Học:</Text>
+                <Text style={styles.label}>Ngày Kết Thúc:</Text>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập năm học (2024)" 
+                <TextInput
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    value={Nam}
-                    onChangeText={setNam}
+                    placeholder="YYYY-MM-DD"
+                    value={ngayKetThuc}
+                    onChangeText={setNgayKetThuc}
                 />
             </View>
 
@@ -131,8 +135,8 @@ const TaoLopHocPhan = () => {
                 <Text style={styles.label}>Giảng Viên:</Text>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập mã giảng viên" 
+                <TextInput
+                    placeholder="Nhập mã giảng viên"
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
                     value={GV}
@@ -140,31 +144,32 @@ const TaoLopHocPhan = () => {
                 />
             </View>
 
-            {/* Sinh Viens - Add students to class */}
+            {/* Phan Loai */}
             <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Mã Sinh Viên (cách nhau bởi dấu phẩy):</Text>
+                <Text style={styles.label}>Phân Loại:</Text>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập mã sinh viên" 
+                <TextInput
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    value={maSinhViens.join(",")}
-                    onChangeText={text => setMaSinhViens(text.split(",").map(item => item.trim()))}
+                    placeholder="Nhập phân loại"
+                    value={phanLoai}
+                    onChangeText={setPhanLoai}
                 />
             </View>
 
+
             {/* Submit Button */}
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleTaoLopHocPhan}>
-                    <Text style={styles.buttonText}>TẠO LỚP HỌC PHẦN</Text>
+                <TouchableOpacity style={styles.button} onPress={handleCreateLichHoc}>
+                    <Text style={styles.buttonText}>TẠO LỊCH HỌC</Text>
                 </TouchableOpacity>
             </View>
         </View>
     );
 };
 
-export default TaoLopHocPhan;
+export default TaoLichHoc;
 
 const styles = StyleSheet.create({
     container: {

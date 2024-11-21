@@ -170,6 +170,7 @@ const functionsDataQL = [
     { title: 'Thông tin sinh viên', iconComponent: () => <Ionicons name="apps" size={40} color="blue" />, navigateTo: 'ThongTinSinhVien' },
     { title: 'Tạo tài khoản cho sinh viên', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="orange" />, navigateTo: 'TaoTaiKhoan' },
     { title: 'Tạo lớp học phần', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="red" />, navigateTo: 'TaoLopHocPhan' },
+    { title: 'Tạo lịch học', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="pink" />, navigateTo: 'TaoLichHoc' },
 ];
 
 export default TrangChu;

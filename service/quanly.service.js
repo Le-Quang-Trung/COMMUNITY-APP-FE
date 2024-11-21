@@ -16,7 +16,6 @@ export const getQuanLyByMaQL = async (maQL) => {
     }
 };
 
-// Hàm gửi yêu cầu tạo lớp học phần mới
 export const createLopHocPhan = async (lopHocPhanData) => {
     try {
         const response = await fetch(`${host}/quanly/createLopHocPhan`, {
@@ -66,3 +65,26 @@ export const addSinhVienToLopHocPhan = async (maLHP, maSinhViens) => {
         throw error; // Ném lỗi để xử lý ở nơi gọi hàm này
     }
 };
+
+export const createLichHoc = async (data) => {
+    try {
+        const response = await fetch(`${host}/quanly/createLichHoc`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Không thể tạo lịch học');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error creating LichHoc:', error.message);
+        throw error;
+    }
+};
+
