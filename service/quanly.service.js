@@ -1,6 +1,5 @@
 import { host } from './config';
 
-
 export const getQuanLyByMaQL = async (maQL) => {
     try {
         const response = await fetch(`${host}/quanly/${maQL}`);
@@ -14,5 +13,56 @@ export const getQuanLyByMaQL = async (maQL) => {
     } catch (error) {
         console.error('Lỗi khi lấy thông tin quản lý:', error);
         throw error;
+    }
+};
+
+// Hàm gửi yêu cầu tạo lớp học phần mới
+export const createLopHocPhan = async (lopHocPhanData) => {
+    try {
+        const response = await fetch(`${host}/quanly/createLopHocPhan`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(lopHocPhanData), // Dữ liệu lớp học phần
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Lỗi khi tạo lớp học phần');
+        }
+
+        const result = await response.json();
+        return result; // Trả về kết quả thành công
+
+    } catch (error) {
+        console.error('Error creating LopHocPhan:', error);
+        throw error; // Ném lỗi để xử lý ở nơi gọi hàm này
+    }
+};
+
+export const addSinhVienToLopHocPhan = async (maLHP, maSinhViens) => {
+    try {
+        const response = await fetch(`${host}/quanly/addSinhVienToLopHocPhan`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                maLHP, 
+                maSinhViens
+            }), // Tham số gửi lên API
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Lỗi khi thêm sinh viên vào lớp học phần');
+        }
+
+        const result = await response.json();
+        return result; // Trả về kết quả thành công
+    } catch (error) {
+        console.error('Error adding SinhVien to LopHocPhan:', error);
+        throw error; // Ném lỗi để xử lý ở nơi gọi hàm này
     }
 };
