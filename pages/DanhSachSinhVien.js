@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Alert, FlatList, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
 import { deleteSinhVien, getAllSinhVien } from '../service/sinhvien.service';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -48,7 +48,7 @@ const DanhSachSinhVien = () => {
     };
 
     const renderSinhVien = ({ item }) => (
-        <View style={styles.sinhVienItem}>
+        <ScrollView style={styles.sinhVienItem}>
             <Text style={styles.hoTen}>{item.hoTen}</Text>
             <Text style={styles.mssv}>MSSV: {item.mssv}</Text>
             <Text style={styles.nganh}>Ngành: {item.nganh}</Text>
@@ -63,7 +63,7 @@ const DanhSachSinhVien = () => {
                     <Text style={styles.buttonText}>XÓA SINH VIÊN</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     );
 
     return (

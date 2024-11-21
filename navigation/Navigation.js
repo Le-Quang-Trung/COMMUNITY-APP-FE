@@ -26,6 +26,9 @@ import TaoTaiKhoan from "../pages/TaoTaiKhoan.js";
 import ThongTinSinhVien from "../pages/ThongTinSinhVien.js";
 import DanhSachSinhVien from "../pages/DanhSachSinhVien.js";
 
+import TaoDiemSo from "../pages/TaoDiemSo.js";
+import CapNhatDiemSo from "../pages/CapNhatDiemSo.js";
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -150,6 +153,8 @@ const Navigation = () => {
         <Stack.Screen name="TaoTaiKhoan" component={TaoTaiKhoan} options={{headerShown: false}}/>
         <Stack.Screen name="ThongTinSinhVien" component={ThongTinSinhVien} options={{headerShown: false}}/>
         <Stack.Screen name="DanhSachSinhVien" component={DanhSachSinhVien} options={{headerShown: false}}/>
+        <Stack.Screen name="TaoDiemSo" component={TaoDiemSo} options={{headerShown: false}}/>
+        <Stack.Screen name="CapNhatDiemSo" component={CapNhatDiemSo} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

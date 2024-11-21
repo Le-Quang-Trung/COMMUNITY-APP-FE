@@ -65,7 +65,7 @@ const TraCuuThongTin = () => {
                     <View style={styles.inputLabelContainer}>
                         <TextInput
                             style={styles.inputContainer}
-                            placeholder='1999-01-01'
+                            placeholder='01-01-1999'
                             placeholderTextColor={'gray'}
                             value={ngaySinh}
                             onChangeText={setNgaySinh}

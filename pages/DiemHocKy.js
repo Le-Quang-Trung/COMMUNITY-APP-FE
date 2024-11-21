@@ -18,25 +18,25 @@ const DiemHocKy = () => {
 
     const semesters = Array.from({ length: 9 }, (_, i) => `Học kỳ ${i + 1}`);
 
-    const semesterGrades = {
-        'Học kỳ 1': {
-            gpa: 3.5,
-            gpa4: 3.2,
-            letterGrade: 'B+',
-            classification: 'Khá',
-            creditsEarned: 15,
-            creditsOwed: 3,
-        },
-        'Học kỳ 2': {
-            gpa: 3.8,
-            gpa4: 3.5,
-            letterGrade: 'A',
-            classification: 'Giỏi',
-            creditsEarned: 18,
-            creditsOwed: 0,
-        },
-        // Thêm các học kỳ khác tương tự
-    };
+    // const semesterGrades = {
+    //     'Học kỳ 1': {
+    //         gpa: 3.5,
+    //         gpa4: 3.2,
+    //         letterGrade: 'B+',
+    //         classification: 'Khá',
+    //         creditsEarned: 15,
+    //         creditsOwed: 3,
+    //     },
+    //     'Học kỳ 2': {
+    //         gpa: 3.8,
+    //         gpa4: 3.5,
+    //         letterGrade: 'A',
+    //         classification: 'Giỏi',
+    //         creditsEarned: 18,
+    //         creditsOwed: 0,
+    //     },
+    //     // Thêm các học kỳ khác tương tự
+    // };
 
     const handleSelectSemester = async (semester) => {
         setSelectedSemester(semester);
@@ -123,7 +123,7 @@ const DiemHocKy = () => {
                             </View>
                         )}
                     />
-                    {semesterGrades[selectedSemester] ? (
+                    {/* {semesterGrades[selectedSemester] ? (
                         <View style={styles.gradesContainer}>
                             <Text style={styles.gradeText}>
                                 Điểm trung bình học kỳ: {semesterGrades[selectedSemester]?.gpa}
@@ -148,7 +148,7 @@ const DiemHocKy = () => {
                         <View style={styles.gradesContainer}>
                             <Text style={styles.gradeText}>Không có dữ liệu cho học kỳ này</Text>
                         </View>
-                    )}
+                    )} */}
                 </>
             )}
 

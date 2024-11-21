@@ -28,7 +28,7 @@ const CaNhan = () => {
     };
 
 
-    if (!sinhVienData && !giangVienData) {
+    if (!sinhVienData && !giangVienData && !quanLyData) {
         return (
             <View style={styles.container}>
                 <Text>Đang tải thông tin...</Text>
