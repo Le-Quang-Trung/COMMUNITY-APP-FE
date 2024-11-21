@@ -160,7 +160,7 @@ const functionsDataSV = [
 const functionsDataGV = [
     { title: 'Tạo điểm', iconComponent: () => <Ionicons name="document-text-outline" size={40} color="green" />, navigateTo: 'TaoDiemSo' },
     { title: 'Cập nhật điểm số', iconComponent: () => <Ionicons name="document-text" size={40} color="blue" />, navigateTo: 'CapNhatDiemSo' },
-    { title: 'Xem thông tin lớp học', iconComponent: () => <Ionicons name="calendar-outline" size={40} color="orange" />, navigateTo: '' },
+    { title: 'Xem thông tin lớp học', iconComponent: () => <Ionicons name="calendar-outline" size={40} color="orange" />, navigateTo: 'XemThongTinLopHoc' },
     { title: 'Thông báo', iconComponent: () => <Ionicons name="notifications-outline" size={40} color="red" />, navigateTo: 'Thông Báo' },
 ];
 

@@ -28,6 +28,7 @@ import DanhSachSinhVien from "../pages/DanhSachSinhVien.js";
 
 import TaoDiemSo from "../pages/TaoDiemSo.js";
 import CapNhatDiemSo from "../pages/CapNhatDiemSo.js";
+import XemThongTinLopHoc from "../pages/XemThongTinLopHoc.js";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -155,6 +156,7 @@ const Navigation = () => {
         <Stack.Screen name="DanhSachSinhVien" component={DanhSachSinhVien} options={{headerShown: false}}/>
         <Stack.Screen name="TaoDiemSo" component={TaoDiemSo} options={{headerShown: false}}/>
         <Stack.Screen name="CapNhatDiemSo" component={CapNhatDiemSo} options={{headerShown: false}}/>
+        <Stack.Screen name="XemThongTinLopHoc" component={XemThongTinLopHoc} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
