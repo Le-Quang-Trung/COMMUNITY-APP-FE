@@ -106,8 +106,12 @@ const ThongBao = () => {
                     <View style={styles.notificationContainer}>
                         <Text style={styles.notificationTitle}>{item.tieuDeThongBao}</Text>
                         <Text style={styles.notificationContent}>{item.noiDungThongBao}</Text>
+                        {user.role === "giảng viên" &&(
+                            <Text style={styles.notificationContent}>Nguyên nhân: {item.lyDo}</Text>
+                        )}
                         <Text style={styles.notificationContent}>Ngày: {new Date(item.ngayGioThongBao).toLocaleDateString()}</Text>
                         <Text style={styles.notificationFooter}>{item.tenNguoiThongBao}</Text>
+                        
                     </View>
                 )}
             />

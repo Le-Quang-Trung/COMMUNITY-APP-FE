@@ -18,7 +18,7 @@ export const getSinhVienByMSSV = async (mssv) => {
 
 export const getSinhVienByPhuHuynh = async (mssv, hoTen, ngaySinh, soDienThoai) => {
     try {
-        const response = await fetch( `${host}/sinhvien/getSinhVien/${mssv}/${hoTen}/${ngaySinh}/${soDienThoai}`);
+        const response = await fetch(`${host}/sinhvien/getSinhVien/${mssv}/${hoTen}/${ngaySinh}/${soDienThoai}`);
 
         // Kiểm tra xem phản hồi có thành công không
         if (!response.ok) {
@@ -117,5 +117,30 @@ export const getAllSinhVien = async () => {
         throw error;
     }
 };
+
+export const xinNghiPhep = async (data) => {
+    try {
+        const response = await fetch(`${host}/sinhvien/xinNghiPhep`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Không thể gửi yêu cầu xin nghỉ phép');
+        }
+
+        const result = await response.json();
+        console.log('Kết quả xin nghỉ phép:', result);
+        return result;
+    } catch (error) {
+        console.error('Lỗi khi gọi API xin nghỉ phép:', error);
+        throw error;
+    }
+}
+
 
 
