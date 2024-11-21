@@ -31,12 +31,6 @@ const TaoLopHocPhan = () => {
             const result = await createLopHocPhan(lopHocPhanData);
             Alert.alert("Thành công", "Tạo lớp học phần thành công");
 
-            // After class creation, add students to the class
-            if (maSinhViens.length > 0) {
-                const addResult = await addSinhVienToLopHocPhan(result.maLHP, maSinhViens);
-                Alert.alert("Thành công", "Thêm sinh viên vào lớp học phần thành công");
-            }
-
             navigation.goBack(); // Go back to the previous screen
         } catch (error) {
             Alert.alert("Lỗi", error.message);
@@ -137,20 +131,6 @@ const TaoLopHocPhan = () => {
                     style={[styles.input, styles.inputBorder]}
                     value={GV}
                     onChangeText={setGV}
-                />
-            </View>
-
-            {/* Sinh Viens - Add students to class */}
-            <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Mã Sinh Viên (cách nhau bởi dấu phẩy):</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập mã sinh viên" 
-                    placeholderTextColor="#D9D9D9"
-                    style={[styles.input, styles.inputBorder]}
-                    value={maSinhViens.join(",")}
-                    onChangeText={text => setMaSinhViens(text.split(",").map(item => item.trim()))}
                 />
             </View>
 

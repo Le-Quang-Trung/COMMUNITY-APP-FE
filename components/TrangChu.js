@@ -152,7 +152,7 @@ const functionsDataSV = [
     { title: 'Lịch học/ lịch thi', iconComponent: () => <Ionicons name="calendar-outline" size={40} color="orange" />, navigateTo: 'LichHoc' },
     { title: 'Thông báo', iconComponent: () => <Ionicons name="notifications-outline" size={40} color="red" />, navigateTo: 'Thông Báo' },
     { title: 'Phiếu thu tổng hợp', iconComponent: () => <Ionicons name="file-tray-full-outline" size={40} color="lightblue" />, navigateTo: 'PhieuThu' },
-    { title: 'Thanh toán học phí', iconComponent: () => <FontAwesome5 name="search-dollar" size={40} color="black" /> },
+    // { title: 'Thanh toán học phí', iconComponent: () => <FontAwesome5 name="search-dollar" size={40} color="black" /> },
     { title: 'Công nợ', iconComponent: () => <Ionicons name="document-text-outline" size={40} color="pink" />, navigateTo: 'CongNo' },
 ];
 
@@ -167,6 +167,7 @@ const functionsDataGV = [
 // Thông tin các chức năng
 const functionsDataQL = [
     { title: 'Danh sách sinh viên', iconComponent: () => <Ionicons name="duplicate-outline" size={40} color="green" />, navigateTo: 'DanhSachSinhVien' },
+    { title: 'Danh sách lớp học phần', iconComponent: () => <Ionicons name="duplicate-outline" size={40} color="lightblue" />, navigateTo: 'DanhSachLopHocPhan' },
     { title: 'Thông tin sinh viên', iconComponent: () => <Ionicons name="apps" size={40} color="blue" />, navigateTo: 'ThongTinSinhVien' },
     { title: 'Tạo tài khoản cho sinh viên', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="orange" />, navigateTo: 'TaoTaiKhoan' },
     { title: 'Tạo lớp học phần', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="red" />, navigateTo: 'TaoLopHocPhan' },

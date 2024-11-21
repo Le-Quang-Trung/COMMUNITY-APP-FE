@@ -35,6 +35,9 @@ import TaoLichHoc from "../pages/TaoLichHoc.js";
 import TaoThongBaoGV from "../pages/TaoThongBaoGV.js";
 import XinNghiPhep from "../pages/XinNghiPhep.js";
 
+import DanhSachLopHocPhan from "../pages/DanhSachLopHocPhan.js";
+import ThemSVVaoLopHP from "../pages/ThemSVVaoLopHP.js";
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -166,6 +169,8 @@ const Navigation = () => {
         <Stack.Screen name="TaoLichHoc" component={TaoLichHoc} options={{headerShown: false}}/>
         <Stack.Screen name="TaoThongBaoGV" component={TaoThongBaoGV} options={{headerShown: false}}/>
         <Stack.Screen name="XinNghiPhep" component={XinNghiPhep} options={{headerShown: false}}/>
+        <Stack.Screen name="DanhSachLopHocPhan" component={DanhSachLopHocPhan} options={{headerShown: false}}/>
+        <Stack.Screen name="ThemSVVaoLopHP" component={ThemSVVaoLopHP} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
