@@ -1,25 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getThongBaoByMSSV } from '../service/thongbao.service';
+import { getThongBaoByMaGV } from '../service/thongbao.service';
 import { useRecoilValue } from 'recoil';
-import { sinhVienDataState } from '../state';
+import { sinhVienDataState, giangVienDataState, userState } from '../state';
 
 const ThongBao = () => {
     const navigation = useNavigation();
+    const user = useRecoilValue(userState);
     const sinhVienData = useRecoilValue(sinhVienDataState);
-    console.log("đây là dữ liệu sinh viên ở trang thông báo:", sinhVienData);
+    const giangVienData = useRecoilValue(giangVienDataState);
 
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    console.log("đây là thông báo:", notifications)
 
     useEffect(() => {
         const fetchThongBao = async () => {
             setLoading(true);
             setError(null);
             try {
-                const data = await getThongBaoByMSSV(sinhVienData.mssv);
+                let data;
+                if (user.role === "sinh viên" && sinhVienData.mssv) {
+                    data = await getThongBaoByMSSV(sinhVienData.mssv);
+                } else if (user.role === "giảng viên" && giangVienData.maGV) {
+                    data = await getThongBaoByMaGV(giangVienData.maGV);
+                }
                 setNotifications(data);
             } catch (err) {
                 setError(err.message);
@@ -28,10 +37,9 @@ const ThongBao = () => {
             }
         };
 
-        if (sinhVienData.mssv) {
-            fetchThongBao();
-        }
-    }, [sinhVienData.mssv]);
+        // Trigger the fetchThongBao when the role or student/teacher data changes
+        fetchThongBao();
+    }, [user.role, sinhVienData.mssv, giangVienData.maGV]);
 
     if (loading) {
         return (
@@ -45,9 +53,22 @@ const ThongBao = () => {
     if (error) {
         return (
             <View style={styles.Container}>
-                {/* <Text style={styles.errorText}>Lỗi: {error}</Text> */}
                 <Text style={styles.textHeader}>Thông Báo</Text>
                 <Text style={styles.notificationContainer}>Không có thông báo nào.</Text>
+                {user.role === "sinh viên" && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('XinNghiPhep')}>
+                            <Text style={styles.buttonText}>XIN NGHỈ PHÉP</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+                {user.role === "giảng viên" && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoGV')}>
+                            <Text style={styles.buttonText}>TẠO THÔNG BÁO</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
         );
     }
@@ -56,7 +77,21 @@ const ThongBao = () => {
         return (
             <View style={styles.Container}>
                 <Text style={styles.textHeader}>Thông Báo</Text>
-                <Text>Không có thông báo nào.</Text>
+                <Text style={styles.notificationContainer}>Không có thông báo nào.</Text>
+                {user.role === "sinh viên" && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('XinNghiPhep')}>
+                            <Text style={styles.buttonText}>XIN NGHỈ PHÉP</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+                {user.role === "giảng viên" && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoGV')}>
+                            <Text style={styles.buttonText}>TẠO THÔNG BÁO</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
         );
     }
@@ -69,12 +104,29 @@ const ThongBao = () => {
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
                     <View style={styles.notificationContainer}>
-                        <Text style={styles.notificationTitle}>{item.tieuDe}</Text>
-                        <Text style={styles.notificationContent}>{item.noiDung}: Buổi học ngày {new Date(item.ngayGioThongBao).toLocaleDateString()}</Text>
-                        <Text style={styles.notificationFooter}>GV: {item.tenNguoiThongBao}</Text>
+                        <Text style={styles.notificationTitle}>{item.tieuDeThongBao}</Text>
+                        <Text style={styles.notificationContent}>{item.noiDungThongBao}</Text>
+                        <Text style={styles.notificationContent}>Ngày: {new Date(item.ngayGioThongBao).toLocaleDateString()}</Text>
+                        <Text style={styles.notificationFooter}>{item.tenNguoiThongBao}</Text>
                     </View>
                 )}
             />
+            {user.role === "sinh viên" && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('XinNghiPhep')}>
+                        <Text style={styles.buttonText}>XIN NGHỈ PHÉP</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
+            
+            {user.role === "giảng viên" && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoGV')}>
+                        <Text style={styles.buttonText}>TẠO THÔNG BÁO</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 };
@@ -118,6 +170,26 @@ const styles = StyleSheet.create({
     errorText: {
         fontSize: 18,
         color: 'red',
+        textAlign: 'center',
+    },
+    buttonContainer: {
+        flex: 1,            
+        justifyContent: 'center', 
+        alignItems: 'center',       
+        marginBottom: 20,         
+    },
+    button: {
+        width: '80%',
+        height: 40,
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#000',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: 'black',
         textAlign: 'center',
     },
 });
