@@ -22,7 +22,7 @@ const DanhSachLopHocPhan = () => {
         if (!maGV.trim()) {
             throw new Error('Vui lòng nhập mã giảng viên');
         }
-    
+
         try {
             const data = await getGiangVienByMaGV(maGV);
             return data; // Trả về dữ liệu giảng viên
@@ -30,26 +30,26 @@ const DanhSachLopHocPhan = () => {
             throw new Error('Không tìm thấy giảng viên');
         }
     };
-    
+
 
     const handleSelectSemester = async (semester) => {
         setSelectedSemester(semester);
         setModalVisible(false);
         setLoading(true);
         setError(null);
-    
+
         const hocKyNumber = `HK${semester.split(" ")[2]}`; // Tách học kỳ (ví dụ: HK1 từ "Học kỳ 1")
-    
+
         try {
             // Gọi API lấy thông tin giảng viên
             const giangVienData = await handleFetchGiangVien();
-    
+
             // Gọi API lấy thông tin lớp học phần
             const data = await getTTLopHocPhan(maGV);
-    
+
             // Lọc lớp học phần theo mã học kỳ
             const filteredData = data.filter(item => item.maHK.startsWith(hocKyNumber));
-    
+
             setSemesterData(filteredData);
         } catch (err) {
             setError(err.message);
@@ -57,30 +57,53 @@ const DanhSachLopHocPhan = () => {
             setLoading(false);
         }
     };
-    
+
     const renderCourseItem = ({ item }) => {
         return (
-            <TouchableOpacity
-                style={styles.courseItem}
-                onPress={() =>
-                    navigation.navigate('ThemSVVaoLopHP', {
-                        maLHP: item.maLHP, 
-                    })
-                }
-            >
-                <Text style={styles.courseName}>{item.tenLHP}</Text>
-                <Text style={styles.courseCode}>Mã môn học: {item.maMonHoc}</Text>
-                {item.sinhVien.length > 0 ? (
-                    <Text style={styles.enrollment}>Sĩ số: {item.sinhVien.length} sinh viên</Text>
-                ) : (
-                    <Text style={styles.noStudents}>Chưa có sinh viên đăng ký</Text>
-                )}
-                {item.lichHoc.length > 0 ? (
-                    <Text style={styles.schedule}>Lịch học: {item.lichHoc.join(', ')}</Text>
-                ) : (
-                    <Text style={styles.noSchedule}>Chưa có lịch học</Text>
-                )}
-            </TouchableOpacity>
+            <View style={styles.courseItemContainer}>
+                <View style={styles.courseItem} >
+                    <Text style={styles.courseName}>{item.tenLHP}</Text>
+                    <Text style={styles.courseCode}>Mã môn học: {item.maMonHoc}</Text>
+                    {item.sinhVien.length > 0 ? (
+                        <Text style={styles.enrollment}>Sĩ số: {item.sinhVien.length} sinh viên</Text>
+                    ) : (
+                        <Text style={styles.noStudents}>Chưa có sinh viên đăng ký</Text>
+                    )}
+                    {item.lichHoc.length > 0 ? (
+                        <Text style={styles.schedule}>Lịch học: {item.lichHoc.join(', ')}</Text>
+                    ) : (
+                        <Text style={styles.noSchedule}>Chưa có lịch học</Text>
+                    )}
+                    <View style={styles.buttonContainer}>
+                        {/* Nút "Thêm Sinh viên" */}
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() =>
+                                navigation.navigate('ThemSVVaoLopHP', {
+                                    maLHP: item.maLHP,
+                                })
+                            }
+                        >
+                            <Text style={styles.buttonText}>Thêm Sinh viên</Text>
+                        </TouchableOpacity>
+
+                        {/* Nút "Tạo Lịch học" */}
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() =>
+                                navigation.navigate('TaoLichHoc', {
+                                    maLHP: item.maLHP,
+                                    maMonHoc: item.maMonHoc,
+                                })
+                            }
+                        >
+                            <Text style={styles.buttonText}>Tạo Lịch học</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+
+            </View>
         );
     };
 
@@ -159,7 +182,7 @@ const styles = StyleSheet.create({
     modalContent: { width: '80%', backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center' },
     modalItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' },
     modalItemText: { fontSize: 16, color: 'black' },
-    detailsContainer: { marginTop: 20, padding: 10, backgroundColor: '#f9f9f9', borderRadius: 5 },
+    detailsContainer: { marginTop: 20, padding: 10, backgroundColor: '#f9f9f9', borderRadius: 5, flex: 1  },
     detailText: { fontSize: 16, color: 'black', marginVertical: 2 },
     courseItem: { marginBottom: 15, padding: 10, backgroundColor: '#fff', borderRadius: 5, borderWidth: 1, borderColor: '#ddd' },
     courseName: { fontSize: 18, fontWeight: 'bold', color: '#333' },
@@ -183,6 +206,10 @@ const styles = StyleSheet.create({
     inputBorder: {
         borderBottomWidth: 1,
         borderColor: '#D9D9D9',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
     },
     button: {
         marginTop: 20,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -8,13 +8,14 @@ const TaoTaiKhoan = () => {
     const navigation = useNavigation();
 
     const [tenTaiKhoan, setTenTaiKhoan] = useState('');
-    const [matKhau, setMatKhau] = useState('');
 
     const handleTaoTaiKhoan = async () => {
-        if (tenTaiKhoan === '' || matKhau === '') {
-            Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+        if (tenTaiKhoan === '') {
+            Alert.alert('Lỗi', 'Vui lòng nhập tên tài khoản');
             return;
         }
+
+        const matKhau = '1111';  // Mật khẩu mặc định
 
         try {
             // Gọi API tạo tài khoản
@@ -25,7 +26,6 @@ const TaoTaiKhoan = () => {
             Alert.alert("Lỗi", error.message);
         }
     };
-
 
     return (
         <View style={styles.container}>
@@ -52,19 +52,6 @@ const TaoTaiKhoan = () => {
                 />
             </View>
 
-            <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Mật khẩu:</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput 
-                    placeholder="Nhập mật khẩu" 
-                    placeholderTextColor="#D9D9D9"
-                    style={[styles.input, styles.inputBorder]}
-                    value={matKhau}
-                    onChangeText={setMatKhau}
-                    secureTextEntry={true}
-                />
-            </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleTaoTaiKhoan}>
                     <Text style={styles.buttonText}>TẠO TÀI KHOẢN</Text>

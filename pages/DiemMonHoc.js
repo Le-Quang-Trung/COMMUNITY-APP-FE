@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getMaLopHocPhan } from '../service/monhoc.service';
+import { getTenLopHocPhan } from '../service/monhoc.service';
 import { getDiemSo } from '../service/diemso.service';
 import { useRecoilValue } from 'recoil';
 import { sinhVienDataState } from '../state';
@@ -22,7 +22,7 @@ const DiemMonHoc = () => {
             try {
                 setLoading(true);
                 // Fetch subject details first
-                const maLopHocPhan = await getMaLopHocPhan(sinhVienData.mssv, subject.maMonHoc);
+                const maLopHocPhan = await getTenLopHocPhan(sinhVienData.mssv, subject.maMonHoc);
                 setSubjectDetails(maLopHocPhan);
 
                 // Fetch scores after subject details

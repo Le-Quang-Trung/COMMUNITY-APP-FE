@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getThongBaoByMSSV } from '../service/thongbao.service';
-import { getThongBaoByMaGV } from '../service/thongbao.service';
+import { getThongBaoByMSSV, getThongBaoByMaGV } from '../service/thongbao.service';
 import { useRecoilValue } from 'recoil';
 import { sinhVienDataState, giangVienDataState, userState } from '../state';
 
@@ -16,31 +15,46 @@ const ThongBao = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    console.log("đây là thông báo:", notifications)
-
     useEffect(() => {
+        let intervalId;
         const fetchThongBao = async () => {
+            // Bắt đầu việc gọi API, setLoading là true
             setLoading(true);
             setError(null);
+    
             try {
-                let data;
-                if (user.role === "sinh viên" && sinhVienData.mssv) {
+                let data = [];
+                if (user.role === "sinh viên" && sinhVienData?.mssv) {
                     data = await getThongBaoByMSSV(sinhVienData.mssv);
-                } else if (user.role === "giảng viên" && giangVienData.maGV) {
+                } else if (user.role === "giảng viên" && giangVienData?.maGV) {
                     data = await getThongBaoByMaGV(giangVienData.maGV);
                 }
+                
+                // Sắp xếp thông báo theo ngày (mới nhất lên đầu)
+                data.sort((a, b) => new Date(b.ngayGioThongBao) - new Date(a.ngayGioThongBao));
+                
+                console.log("Dữ liệu thông báo sau khi sắp xếp:", data); // Log dữ liệu đã sắp xếp
                 setNotifications(data);
             } catch (err) {
+                console.error("Lỗi API:", err); // Log lỗi nếu có
                 setError(err.message);
             } finally {
+                // Đảm bảo set loading là false sau khi hoàn thành
                 setLoading(false);
             }
         };
-
-        // Trigger the fetchThongBao when the role or student/teacher data changes
+    
+        // Gọi API lần đầu khi component mount
         fetchThongBao();
-    }, [user.role, sinhVienData.mssv, giangVienData.maGV]);
-
+    
+        // Thiết lập interval để gọi API sau mỗi 5 phút 
+        intervalId = setInterval(fetchThongBao, 500000);
+    
+        // Cleanup interval khi component unmount
+        return () => clearInterval(intervalId);
+    }, [user.role, sinhVienData?.mssv, giangVienData?.maGV]);
+    
+    
     if (loading) {
         return (
             <View style={styles.Container}>
@@ -54,21 +68,8 @@ const ThongBao = () => {
         return (
             <View style={styles.Container}>
                 <Text style={styles.textHeader}>Thông Báo</Text>
-                <Text style={styles.notificationContainer}>Không có thông báo nào.</Text>
-                {user.role === "sinh viên" && (
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('XinNghiPhep')}>
-                            <Text style={styles.buttonText}>XIN NGHỈ PHÉP</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-                {user.role === "giảng viên" && (
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoGV')}>
-                            <Text style={styles.buttonText}>TẠO THÔNG BÁO</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
+                <Text style={styles.errorText}>Đã xảy ra lỗi: {error}</Text>
+                {renderButton()}
             </View>
         );
     }
@@ -78,23 +79,32 @@ const ThongBao = () => {
             <View style={styles.Container}>
                 <Text style={styles.textHeader}>Thông Báo</Text>
                 <Text style={styles.notificationContainer}>Không có thông báo nào.</Text>
-                {user.role === "sinh viên" && (
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('XinNghiPhep')}>
-                            <Text style={styles.buttonText}>XIN NGHỈ PHÉP</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-                {user.role === "giảng viên" && (
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoGV')}>
-                            <Text style={styles.buttonText}>TẠO THÔNG BÁO</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
+                {renderButton()}
             </View>
         );
     }
+
+    const renderButton = () => {
+        if (user.role === "sinh viên") {
+            return (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('XinNghiPhep')}>
+                        <Text style={styles.buttonText}>XIN NGHỈ PHÉP</Text>
+                    </TouchableOpacity>
+                </View>
+            );
+        }
+        if (user.role === "giảng viên") {
+            return (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoGV')}>
+                        <Text style={styles.buttonText}>TẠO THÔNG BÁO</Text>
+                    </TouchableOpacity>
+                </View>
+            );
+        }
+        return null;
+    };
 
     return (
         <View style={styles.Container}>
@@ -106,31 +116,16 @@ const ThongBao = () => {
                     <View style={styles.notificationContainer}>
                         <Text style={styles.notificationTitle}>{item.tieuDeThongBao}</Text>
                         <Text style={styles.notificationContent}>{item.noiDungThongBao}</Text>
-                        {user.role === "giảng viên" &&(
+                        {user.role === "giảng viên" && item.lyDo && (
                             <Text style={styles.notificationContent}>Nguyên nhân: {item.lyDo}</Text>
                         )}
                         <Text style={styles.notificationContent}>Ngày: {new Date(item.ngayGioThongBao).toLocaleDateString()}</Text>
                         <Text style={styles.notificationFooter}>{item.tenNguoiThongBao}</Text>
-                        
                     </View>
                 )}
+                ListFooterComponent={renderButton}
+                contentContainerStyle={styles.flatListContainer} // Thêm khoảng trống dưới
             />
-            {user.role === "sinh viên" && (
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('XinNghiPhep')}>
-                        <Text style={styles.buttonText}>XIN NGHỈ PHÉP</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-
-            
-            {user.role === "giảng viên" && (
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoGV')}>
-                        <Text style={styles.buttonText}>TẠO THÔNG BÁO</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
         </View>
     );
 };
@@ -177,10 +172,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     buttonContainer: {
-        flex: 1,            
-        justifyContent: 'center', 
-        alignItems: 'center',       
-        marginBottom: 20,         
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
     },
     button: {
         width: '80%',
@@ -195,5 +190,8 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'black',
         textAlign: 'center',
+    },
+    flatListContainer: {
+        paddingBottom: 40,
     },
 });

@@ -1,36 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
 import { capNhatDiem } from "../service/diemso.service";
-
-const CapNhatDiemSo = () => {
+import { getMonHocById } from "../service/monhoc.service";
+const CapNhatDiemSo = ({ route }) => {
     const navigation = useNavigation();
+    const { maMonHoc, tenLHP } = route.params;
 
-    // State để lưu dữ liệu
-    const [maDiem, setMaDiem] = useState('');
-    const [lopHoc, setLopHoc] = useState('');
-    const [monHoc, setMonHoc] = useState('');
+    // State variables
+    const [monHocData, setMonHocData] = useState("");
+
     const [diemTK1, setDiemTK1] = useState('');
     const [diemTK2, setDiemTK2] = useState('');
     const [diemTK3, setDiemTK3] = useState('');
     const [diemGK, setDiemGK] = useState('');
     const [diemCK, setDiemCK] = useState('');
     const [MSSV, setMSSV] = useState('');
-    const [maMonHoc, setMaMonHoc] = useState('');
+
+
+    // Fetch MonHoc data when component mounts or maMonHoc changes
+    useEffect(() => {
+        const fetchMonHocData = async () => {
+            try {
+                const data = await getMonHocById(maMonHoc);  // Call the API
+                setMonHocData(data);  // Set the fetched data
+            } catch (error) {
+                console.error('Error fetching MonHoc:', error);
+                Alert.alert('Lỗi', 'Không thể lấy thông tin môn học');
+            }
+        };
+        fetchMonHocData();
+    }, [maMonHoc]);
 
     const handleCapNhatDiemSo = async () => {
         const diemSoData = {
-            maDiem,
-            lopHoc,
-            monHoc,
+            lopHoc: tenLHP,
+            monHoc: monHocData?.tenMonHoc,
+            maMonHoc: maMonHoc,
+            MSSV,
             diemTK1,
             diemTK2,
             diemTK3,
             diemGK,
             diemCK,
-            MSSV,
-            maMonHoc,
         };
 
         try {
@@ -55,41 +68,97 @@ const CapNhatDiemSo = () => {
                 />
                 <Text style={styles.title}>Cập Nhật Điểm Số</Text>
             </View>
+            <View style={styles.row}>
+                <Text style={styles.label}>Tên Lớp Học: {tenLHP}</Text>
+            </View>
+            <View style={styles.row}>
+                <Text style={styles.label}>Mã Môn Học: {maMonHoc}</Text>
+            </View>
+            <View style={styles.row}>
+                <Text style={styles.label}>Tên Môn Học: {monHocData.tenMonHoc}</Text>
+            </View>
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Mã Số Sinh Viên:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập mã số sinh viên"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={MSSV}
+                    onChangeText={setMSSV}
+                />
+            </View>
 
-            {/* Form nhập liệu */}
-            {[
-                { label: 'Mã Điểm', value: maDiem, onChange: setMaDiem },
-                { label: 'Lớp Học', value: lopHoc, onChange: setLopHoc },
-                { label: 'Môn Học', value: monHoc, onChange: setMonHoc },
-                { label: 'Điểm TK1', value: diemTK1, onChange: setDiemTK1 },
-                { label: 'Điểm TK2', value: diemTK2, onChange: setDiemTK2 },
-                { label: 'Điểm TK3', value: diemTK3, onChange: setDiemTK3 },
-                { label: 'Điểm GK', value: diemGK, onChange: setDiemGK },
-                { label: 'Điểm CK', value: diemCK, onChange: setDiemCK },
-                { label: 'MSSV', value: MSSV, onChange: setMSSV },
-                { label: 'Mã Môn Học', value: maMonHoc, onChange: setMaMonHoc },
-            ].map((field, index) => (
-                <View key={index} >
-                    <View style={[styles.row, { marginTop: 20 }]}>
-                        <Text style={styles.label}>{field.label}:</Text>
-                    </View>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            placeholder={`Nhập ${field.label.toLowerCase()}`}
-                            placeholderTextColor="#D9D9D9"
-                            style={[styles.input, styles.inputBorder]}
-                            value={field.value}
-                            onChangeText={field.onChange}
-                            keyboardType={['Điểm TK1', 'Điểm TK2', 'Điểm TK3', 'Điểm GK', 'Điểm CK'].includes(field.label) ? 'numeric' : 'default'}
-                        />
-                    </View>
-                </View>
-            ))}
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm TK1:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm TK1"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemTK1}
+                    onChangeText={setDiemTK1}
+                />
+            </View>
 
-            {/* Nút cập nhật */}
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm TK2:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm TK2"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemTK2}
+                    onChangeText={setDiemTK2}
+                />
+            </View>
+
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm TK3:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm TK3"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemTK3}
+                    onChangeText={setDiemTK3}
+                />
+            </View>
+
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm GK:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm GK"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemGK}
+                    onChangeText={setDiemGK}
+                />
+            </View>
+
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm CK:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm CK"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemCK}
+                    onChangeText={setDiemCK}
+                />
+            </View>
+
+            {/* Nút gửi */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleCapNhatDiemSo}>
-                    <Text style={styles.buttonText}>CẬP NHẬT</Text>
+                    <Text style={styles.buttonText}>CẬP NHẬT ĐIỂM SỐ</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
@@ -150,6 +219,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 20,
+        paddingBottom: 20,
     },
     button: {
         width: '80%',

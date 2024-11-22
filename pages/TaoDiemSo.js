@@ -1,35 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert, ScrollView } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { taoDiem } from "../service/diemso.service";
+import { getMonHocById } from "../service/monhoc.service";
 
-const TaoDiemSo = () => {
+const TaoDiemSo = ({ route }) => {
     const navigation = useNavigation();
+    const { maMonHoc, tenLHP } = route.params;
 
-    // State để lưu dữ liệu
-    const [lopHoc, setLopHoc] = useState('');
-    const [monHoc, setMonHoc] = useState('');
+    // State variables
+    const [monHocData, setMonHocData] = useState("");  
+
     const [diemTK1, setDiemTK1] = useState('');
     const [diemTK2, setDiemTK2] = useState('');
     const [diemTK3, setDiemTK3] = useState('');
     const [diemGK, setDiemGK] = useState('');
     const [diemCK, setDiemCK] = useState('');
     const [MSSV, setMSSV] = useState('');
-    const [maMonHoc, setMaMonHoc] = useState('');
+
+     // Fetch MonHoc data when component mounts or maMonHoc changes
+     useEffect(() => {
+        const fetchMonHocData = async () => {
+            try {
+                const data = await getMonHocById(maMonHoc);  // Call the API
+                setMonHocData(data);  // Set the fetched data
+            } catch (error) {
+                console.error('Error fetching MonHoc:', error);
+                Alert.alert('Lỗi', 'Không thể lấy thông tin môn học');
+            }
+        };
+        fetchMonHocData();
+    }, [maMonHoc]); 
 
     const handleTaoDiem = async () => {
         // Chuẩn bị dữ liệu gửi
         const diemSoData = {
-            lopHoc,
-            monHoc,
+            lopHoc: tenLHP,
+            monHoc: monHocData?.tenMonHoc,
+            maMonHoc: maMonHoc,
+            MSSV,
             diemTK1: diemTK1 || null,
             diemTK2: diemTK2 || null,
             diemTK3: diemTK3 || null,
             diemGK: diemGK || null,
             diemCK: diemCK || null,
-            MSSV,
-            maMonHoc,
+
         };
 
         try {
@@ -53,35 +69,93 @@ const TaoDiemSo = () => {
                 />
                 <Text style={styles.title}>Tạo Điểm Số</Text>
             </View>
+            <View style={styles.row}>
+                <Text style={styles.label}>Tên Lớp Học: {tenLHP}</Text>
+            </View>
+            <View style={styles.row}>
+                <Text style={styles.label}>Mã Môn Học: {maMonHoc}</Text>
+            </View>
+            <View style={styles.row}>
+                <Text style={styles.label}>Tên Môn Học: {monHocData.tenMonHoc}</Text>
+            </View>
 
-            {/* Form nhập liệu */}
-            {[
-                { label: 'Lớp Học', value: lopHoc, onChange: setLopHoc },
-                { label: 'Môn Học', value: monHoc, onChange: setMonHoc },
-                { label: 'Điểm TK1', value: diemTK1, onChange: setDiemTK1 },
-                { label: 'Điểm TK2', value: diemTK2, onChange: setDiemTK2 },
-                { label: 'Điểm TK3', value: diemTK3, onChange: setDiemTK3 },
-                { label: 'Điểm GK', value: diemGK, onChange: setDiemGK },
-                { label: 'Điểm CK', value: diemCK, onChange: setDiemCK },
-                { label: 'Mã Số Sinh Viên', value: MSSV, onChange: setMSSV },
-                { label: 'Mã Môn Học', value: maMonHoc, onChange: setMaMonHoc },
-            ].map((field, index) => (
-                <View key={index}>
-                    <View style={[styles.row, { marginTop: 20 }]}>
-                        <Text style={styles.label}>{field.label}:</Text>
-                    </View>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            placeholder={`Nhập ${field.label.toLowerCase()}`}
-                            placeholderTextColor="#D9D9D9"
-                            style={[styles.input, styles.inputBorder]}
-                            value={field.value}
-                            onChangeText={field.onChange}
-                            keyboardType={['Điểm TK1', 'Điểm TK2', 'Điểm TK3', 'Điểm GK', 'Điểm CK'].includes(field.label) ? 'numeric' : 'default'}
-                        />
-                    </View>
-                </View>
-            ))}
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Mã Số Sinh Viên:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập mã số sinh viên"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={MSSV}
+                    onChangeText={setMSSV}
+                />
+            </View>
+
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm TK1:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm TK1"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemTK1}
+                    onChangeText={setDiemTK1}
+                />
+            </View>
+
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm TK2:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm TK2"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemTK2}
+                    onChangeText={setDiemTK2}
+                />
+            </View>
+
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm TK3:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm TK3"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemTK3}
+                    onChangeText={setDiemTK3}
+                />
+            </View>
+
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm GK:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm GK"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemGK}
+                    onChangeText={setDiemGK}
+                />
+            </View>
+
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Điểm CK:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập điểm CK"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={diemCK}
+                    onChangeText={setDiemCK}
+                />
+            </View>
 
             {/* Nút gửi */}
             <View style={styles.buttonContainer}>

@@ -19,9 +19,9 @@ export const getMonHocByHocKy = async (mssv, hocky) => {
 };
 
 
-export const getMaLopHocPhan = async (mssv, maMonHoc) => {
+export const getTenLopHocPhan = async (mssv, maMonHoc) => {
     try {
-        const response = await fetch(`${host}/monhoc/getMaLopHocPhan/${mssv}/${maMonHoc}`);
+        const response = await fetch(`${host}/monhoc/getTenLopHocPhan/${mssv}/${maMonHoc}`);
         
         // Kiểm tra nếu không thành công
         if (!response.ok) {
@@ -36,3 +36,20 @@ export const getMaLopHocPhan = async (mssv, maMonHoc) => {
     }
 };
 
+export const getMonHocById = async (maMonHoc) => {
+  try {
+      // Gửi yêu cầu GET tới API với maMonHoc
+      const response = await fetch(`${host}/monhoc/getMonHoc/${maMonHoc}`);
+
+      if (!response.ok) {
+          throw new Error('Không thể lấy thông tin môn học');
+      }
+
+      // Lấy dữ liệu từ phản hồi
+      const monHoc = await response.json();
+      return monHoc; // Trả về dữ liệu môn học
+  } catch (error) {
+      console.error('Lỗi khi gọi API:', error);
+      throw error; 
+  }
+};

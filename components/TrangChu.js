@@ -158,8 +158,8 @@ const functionsDataSV = [
 
 // Thông tin các chức năng
 const functionsDataGV = [
-    { title: 'Tạo điểm', iconComponent: () => <Ionicons name="document-text-outline" size={40} color="green" />, navigateTo: 'TaoDiemSo' },
-    { title: 'Cập nhật điểm số', iconComponent: () => <Ionicons name="document-text" size={40} color="blue" />, navigateTo: 'CapNhatDiemSo' },
+    // { title: 'Tạo điểm', iconComponent: () => <Ionicons name="document-text-outline" size={40} color="green" />, navigateTo: 'TaoDiemSo' },
+    // { title: 'Cập nhật điểm số', iconComponent: () => <Ionicons name="document-text" size={40} color="blue" />, navigateTo: 'CapNhatDiemSo' },
     { title: 'Xem thông tin lớp học', iconComponent: () => <Ionicons name="calendar-outline" size={40} color="orange" />, navigateTo: 'XemThongTinLopHoc' },
     { title: 'Thông báo', iconComponent: () => <Ionicons name="notifications-outline" size={40} color="red" />, navigateTo: 'Thông Báo' },
 ];
@@ -171,7 +171,6 @@ const functionsDataQL = [
     { title: 'Thông tin sinh viên', iconComponent: () => <Ionicons name="apps" size={40} color="blue" />, navigateTo: 'ThongTinSinhVien' },
     { title: 'Tạo tài khoản cho sinh viên', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="orange" />, navigateTo: 'TaoTaiKhoan' },
     { title: 'Tạo lớp học phần', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="red" />, navigateTo: 'TaoLopHocPhan' },
-    { title: 'Tạo lịch học', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="pink" />, navigateTo: 'TaoLichHoc' },
 ];
 
 export default TrangChu;

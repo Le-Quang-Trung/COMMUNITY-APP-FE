@@ -1,32 +1,75 @@
 import React, { useState } from "react";
-import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
+import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert, Modal, FlatList, ScrollView } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { createLichHoc } from "../service/quanly.service";
 
-const TaoLichHoc = () => {
+const TaoLichHoc = ({ route }) => {
     const navigation = useNavigation();
+    const { maLHP, maMonHoc } = route.params;
 
-    const [maLHP, setMaLHP] = useState('');
-    const [maMonHoc, setMaMonHoc] = useState('');
     const [ngayBatDau, setNgayBatDau] = useState('');
     const [ngayKetThuc, setNgayKetThuc] = useState('');
     const [GV, setGV] = useState('');
-    const [phanLoai, setPhanLoai] = useState('');
+
+
     const [lichHoc, setLichHoc] = useState([]);
 
+    const [ngayHoc, setNgayHoc] = useState('');
+    const [tietHoc, setTietHoc] = useState('');
+    const [phongHoc, setPhongHoc] = useState('');
+    const [phanLoai, setPhanLoai] = useState('');
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalType, setModalType] = useState('');
+
+    const optionsNgayHoc = [
+        { label: "Thứ 2", value: "1" },
+        { label: "Thứ 3", value: "2" },
+        { label: "Thứ 4", value: "3" },
+        { label: "Thứ 5", value: "4" },
+        { label: "Thứ 6", value: "5" },
+        { label: "Thứ 7", value: "6" },
+        { label: "Chủ nhật", value: "7" },
+    ];
+
+    const optionsTietHoc = [
+        { label: "1-3", value: "1-3" },
+        { label: "4-6", value: "4-6" },
+        { label: "7-9", value: "7-9" },
+        { label: "10-12", value: "10-12" },
+    ];
+
+    const openModal = (type) => {
+        setModalType(type);
+        setModalVisible(true);
+    };
+
+    const closeModal = () => {
+        setModalVisible(false);
+    };
+
+    const handleOptionSelect = (value) => {
+        if (modalType === "ngayHoc") setNgayHoc(value);
+        if (modalType === "tietHoc") setTietHoc(value);
+        closeModal();
+    };
+
     const handleCreateLichHoc = async () => {
-        if (lichHoc === '' || maLHP === '' || maMonHoc === '' || ngayBatDau === '' || ngayKetThuc === '' || GV === '' || phanLoai === '') {
+        if (!ngayHoc || !tietHoc || !phongHoc || !ngayBatDau || !ngayKetThuc || !GV || !phanLoai) {
             Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
             return;
         }
-    
-        // Xử lý dữ liệu `lichHoc`
-        const parsedLichHoc = lichHoc.split(',').map((item) => {
-            const [ngayHoc, tietHoc, phongHoc] = item.split(':');
-            return { ngayHoc: parseInt(ngayHoc), tietHoc, phongHoc };
-        });
-    
+
+        const parsedLichHoc = [
+            {
+                ngayHoc: parseInt(ngayHoc),
+                tietHoc,
+                phongHoc,
+                phanLoai,
+            },
+        ];
+
         const data = {
             maLHP,
             maMonHoc,
@@ -34,21 +77,19 @@ const TaoLichHoc = () => {
             ngayBatDau,
             ngayKetThuc,
             GV,
-            phanLoai,
+
         };
-    
+
         try {
             const result = await createLichHoc(data);
-            Alert.alert('Thành công', 'Tạo lịch học thành công!');
-            console.log('Lịch học đã tạo:', result);
-            navigation.goBack(); 
+            Alert.alert("Thành công", "Tạo lịch học thành công!");
+            navigation.goBack();
         } catch (error) {
-            Alert.alert('Lỗi', error.message);
+            Alert.alert("Lỗi", error.message);
         }
     };
-    
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={styles.header}>
                 <AntDesign
                     name="arrowleft"
@@ -62,45 +103,115 @@ const TaoLichHoc = () => {
 
             {/* Ma Lop Hoc Phan*/}
             <View style={styles.row}>
-                <Text style={styles.label}>Mã Lớp Học Phần:</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder="Nhập tên lớp học"
-                    placeholderTextColor="#D9D9D9"
-                    style={[styles.input, styles.inputBorder]}
-                    value={maLHP}
-                    onChangeText={setMaLHP}
-                />
+                <Text style={styles.label}>Mã Lớp Học Phần: {maLHP}</Text>
             </View>
 
             {/* Ma Mon Hoc */}
             <View style={[styles.row, { marginTop: 20 }]} >
-                <Text style={styles.label}>Mã Môn Học:</Text>
+                <Text style={styles.label}>Mã Môn Học: {maMonHoc}</Text>
+            </View>
+
+
+            {/* Ngày Học */}
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text>Ngày Học:  </Text>
+                <TouchableOpacity
+                    style={styles.optionButton}  // Thêm style cho button
+                    onPress={() => openModal("ngayHoc")}
+                >
+                    <Text style={styles.optionText}>
+                        {ngayHoc ? `Thứ ${["2", "3", "4", "5", "6", "7", "Chủ nhật"][ngayHoc - 1]}` : "Chọn ngày học"}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+
+
+            {/* Tiết Học */}
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text>Tiết Học:  </Text>
+                <TouchableOpacity
+                    style={styles.optionButton}  // Thêm style cho button
+                    onPress={() => openModal("tietHoc")}
+                >
+                    <Text style={styles.optionText}>{tietHoc || "Chọn tiết học"}</Text>
+                </TouchableOpacity>
+            </View>
+
+
+
+
+            {/* Modal */}
+            <Modal
+                visible={modalVisible}
+                animationType="slide"
+                transparent={true}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <FlatList
+                            data={modalType === "ngayHoc" ? optionsNgayHoc : optionsTietHoc}
+                            keyExtractor={(item) => item.value}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.modalItem}
+                                    onPress={() => handleOptionSelect(item.value)}
+                                >
+                                    <Text>{item.label}</Text>
+                                </TouchableOpacity>
+                            )}
+                        />
+                        <TouchableOpacity
+                            style={styles.modalClose}
+                            onPress={closeModal}
+                        >
+                            <Text>Đóng</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Phòng Học */}
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Phòng Học:</Text>
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    placeholder="Nhập mã môn học"
+                    placeholder="Nhập phòng học"
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    value={maMonHoc}
-                    onChangeText={setMaMonHoc}
+                    value={phongHoc}
+                    onChangeText={setPhongHoc}
                 />
             </View>
 
-            {/* Lich Hoc */}
+            {/* Phan Loai */}
             <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Lịch Học:</Text>
+                <Text style={styles.label}>Phân Loại:</Text>
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    placeholder="ngayHoc: ;tietHoc: ;phongHoc:"
-                    value={lichHoc}
-                    onChangeText={setLichHoc}
+                    placeholder="Nhập phân loại"
+                    value={phanLoai}
+                    onChangeText={setPhanLoai}
                 />
             </View>
+
+            {/* Giang Vien */}
+            <View style={[styles.row, { marginTop: 20 }]}>
+                <Text style={styles.label}>Giảng Viên:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    placeholder="Nhập mã giảng viên"
+                    placeholderTextColor="#D9D9D9"
+                    style={[styles.input, styles.inputBorder]}
+                    value={GV}
+                    onChangeText={setGV}
+                />
+            </View>
+
 
             {/* Ngay Bat Dau */}
             <View style={[styles.row, { marginTop: 20 }]}>
@@ -130,42 +241,13 @@ const TaoLichHoc = () => {
                 />
             </View>
 
-            {/* Giang Vien */}
-            <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Giảng Viên:</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder="Nhập mã giảng viên"
-                    placeholderTextColor="#D9D9D9"
-                    style={[styles.input, styles.inputBorder]}
-                    value={GV}
-                    onChangeText={setGV}
-                />
-            </View>
-
-            {/* Phan Loai */}
-            <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Phân Loại:</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholderTextColor="#D9D9D9"
-                    style={[styles.input, styles.inputBorder]}
-                    placeholder="Nhập phân loại"
-                    value={phanLoai}
-                    onChangeText={setPhanLoai}
-                />
-            </View>
-
-
             {/* Submit Button */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleCreateLichHoc}>
                     <Text style={styles.buttonText}>TẠO LỊCH HỌC</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     );
 };
 
@@ -235,6 +317,41 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: 'black',
+        textAlign: 'center',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+        width: "80%",
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        padding: 20,
+    },
+    modalItem: {
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: "#ccc",
+    },
+    modalClose: {
+        marginTop: 10,
+        alignItems: "center",
+    },
+    optionButton: {
+        width: '35%',
+        paddingVertical: 3,
+        backgroundColor: '#F9FFFF',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#D9D9D9',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    optionText: {
+        color: '#333',
         textAlign: 'center',
     },
 });

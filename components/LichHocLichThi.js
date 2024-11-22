@@ -3,14 +3,15 @@ import { View, StyleSheet, Text, FlatList, TouchableOpacity, Modal, Button } fro
 import AntDesign from '@expo/vector-icons/AntDesign';
 import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
-import { getLichHocByMSSV } from '../service/lichhoclichthi.service';
+import { getLichHocByMSSV, getLichDayByMaGV } from '../service/lichhoclichthi.service';
 import { useRecoilValue } from 'recoil';
-import { sinhVienDataState, userState } from '../state';
+import { sinhVienDataState, userState, giangVienDataState } from '../state';
 
 const LichHocLichThi = () => { 
   const navigation = useNavigation();
-  const user = useRecoilValue(userState);
-  const sinhVienData = useRecoilValue(sinhVienDataState);
+  const user = useRecoilValue(userState); 
+  const sinhVienData = useRecoilValue(sinhVienDataState); 
+  const giangVienData = useRecoilValue(giangVienDataState); 
   const [currentDate, setCurrentDate] = useState(moment());
   const [selectedDay, setSelectedDay] = useState(null);
   const [monthModalVisible, setMonthModalVisible] = useState(false);
@@ -18,15 +19,21 @@ const LichHocLichThi = () => {
 
   useEffect(() => {
     const fetchSchedule = async () => {
-      if (user.role !== 'sinh viên') {
-        console.warn('Chỉ sinh viên mới có quyền xem lịch học.');
-        return; // Dừng nếu không phải sinh viên
-      }
-  
       try {
-        const data = await getLichHocByMSSV(sinhVienData.mssv); 
+        let data;
+        
+        if (user.role === 'sinh viên') {
+          // Fetch schedule for student using mssv
+          data = await getLichHocByMSSV(sinhVienData.mssv);
+        } else if (user.role === 'giảng viên') {
+          // Fetch schedule for teacher using maGV
+          data = await getLichDayByMaGV(giangVienData.maGV);
+        } else {
+          console.warn('Role không xác định');
+          return;
+        }
+        
         const days = {};
-  
         data.forEach(schedule => {
           const startDate = moment(schedule.ngayBatDau);
           const endDate = moment(schedule.ngayKetThuc);
@@ -44,7 +51,7 @@ const LichHocLichThi = () => {
                 subject: schedule.tenMonHoc,
                 room: scheduledDay.phongHoc,
                 time: scheduledDay.tietHoc,
-                teacher: schedule.GV
+                teacher: schedule.tenGV
               });
             }
           }
@@ -52,13 +59,12 @@ const LichHocLichThi = () => {
   
         setScheduledDays(days); // Update the state with the fetched schedule
       } catch (error) {
-        console.error('Error fetching schedule:', error.message); // Handle error silently if you don't need UI updates
+        console.error('Error fetching schedule:', error.message);
       }
     };
   
     fetchSchedule();
-  }, [user.role, sinhVienData.mssv]); // Re-run the effect if role or mssv changes
-  
+  }, [user.role, sinhVienData.mssv, giangVienData.maGV]); // Re-run the effect if role, mssv, or maGV changes
 
   const startOfWeek = currentDate.clone().startOf('isoWeek');
   const days = [];
@@ -178,7 +184,7 @@ const LichHocLichThi = () => {
               <Text style={styles.detailText}>Môn học: {schedule.subject}</Text>
               <Text style={styles.detailText}>Phòng học: {schedule.room}</Text>
               <Text style={styles.detailText}>Giờ học: {schedule.time}</Text>
-              <Text style={styles.detailText}>Giáo viên: {schedule.teacher}</Text>
+              <Text style={styles.detailText}>Giảng viên: {schedule.teacher}</Text>
             </View>
           ))}
         </View>
@@ -197,9 +203,10 @@ const LichHocLichThi = () => {
       </Modal>
     </View>
   );
-}
+};
 
 export default LichHocLichThi;
+
 
 const styles = StyleSheet.create({
   container: {
