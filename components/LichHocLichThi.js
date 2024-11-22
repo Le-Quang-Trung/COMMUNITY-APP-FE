@@ -7,11 +7,11 @@ import { getLichHocByMSSV, getLichDayByMaGV } from '../service/lichhoclichthi.se
 import { useRecoilValue } from 'recoil';
 import { sinhVienDataState, userState, giangVienDataState } from '../state';
 
-const LichHocLichThi = () => { 
+const LichHocLichThi = () => {
   const navigation = useNavigation();
-  const user = useRecoilValue(userState); 
-  const sinhVienData = useRecoilValue(sinhVienDataState); 
-  const giangVienData = useRecoilValue(giangVienDataState); 
+  const user = useRecoilValue(userState);
+  const sinhVienData = useRecoilValue(sinhVienDataState);
+  const giangVienData = useRecoilValue(giangVienDataState);
   const [currentDate, setCurrentDate] = useState(moment());
   const [selectedDay, setSelectedDay] = useState(null);
   const [monthModalVisible, setMonthModalVisible] = useState(false);
@@ -21,27 +21,27 @@ const LichHocLichThi = () => {
     const fetchSchedule = async () => {
       try {
         let data;
-        
-        if (user.role === 'sinh viên') {
+
+        if (user.role === 'sinh viên' && sinhVienData?.mssv) {
           // Fetch schedule for student using mssv
           data = await getLichHocByMSSV(sinhVienData.mssv);
-        } else if (user.role === 'giảng viên') {
+        } else if (user.role === 'giảng viên' && giangVienData?.maGV) {
           // Fetch schedule for teacher using maGV
           data = await getLichDayByMaGV(giangVienData.maGV);
         } else {
-          console.warn('Role không xác định');
+          console.warn('Role không xác định hoặc dữ liệu không đầy đủ');
           return;
         }
-        
+
         const days = {};
         data.forEach(schedule => {
           const startDate = moment(schedule.ngayBatDau);
           const endDate = moment(schedule.ngayKetThuc);
-  
+
           for (let date = startDate; date.isBefore(endDate) || date.isSame(endDate); date.add(1, 'days')) {
             const dayOfWeek = date.isoWeekday(); // 1 (Monday) to 7 (Sunday)
             const scheduledDay = schedule.lichHoc.find(item => item.ngayHoc === dayOfWeek);
-  
+
             if (scheduledDay) {
               const formattedDate = date.format('YYYY-MM-DD');
               if (!days[formattedDate]) {
@@ -56,15 +56,16 @@ const LichHocLichThi = () => {
             }
           }
         });
-  
+
         setScheduledDays(days); // Update the state with the fetched schedule
       } catch (error) {
         console.error('Error fetching schedule:', error.message);
       }
     };
-  
+
     fetchSchedule();
-  }, [user.role, sinhVienData.mssv, giangVienData.maGV]); // Re-run the effect if role, mssv, or maGV changes
+  }, [user.role, sinhVienData?.mssv, giangVienData?.maGV]); // Ensure valid data is available before fetching
+
 
   const startOfWeek = currentDate.clone().startOf('isoWeek');
   const days = [];
@@ -161,7 +162,7 @@ const LichHocLichThi = () => {
             const hasSchedule = scheduledDays[item];
             return (
               <View style={styles.dayContainer}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.dayButton, isSelected && styles.selectedDay, hasSchedule && styles.hasSchedule]}
                   onPress={() => handleDayPress(item)}
                 >
