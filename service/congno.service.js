@@ -45,3 +45,19 @@ export const getCongNo = async (mssv, nganh, hocKy) => {
         throw error;
     }
 };
+
+export const getKhauTruByMSSV = async (MSSV) => {
+    try {
+        const response = await fetch(`${host}/congno/getKhauTru/${MSSV}`);
+        
+        if (!response.ok) {
+            throw new Error(`Error fetching KhauTru: ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching KhauTru:', error);
+        throw error; // Để xử lý lỗi ở component sử dụng
+    }
+};

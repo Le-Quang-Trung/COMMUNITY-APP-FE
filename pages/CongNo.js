@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Modal, FlatList, Button, ScrollView } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
-import { getCongNo } from '../service/congno.service';
+import { getCongNo, getKhauTruByMSSV } from '../service/congno.service';
 import { useRecoilValue } from 'recoil';
 import { sinhVienDataState } from '../state';
 
@@ -13,6 +13,7 @@ const CongNo = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState(null);
     const [debtData, setDebtData] = useState([]);
+    const [khauTruData, setKhauTruData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -38,8 +39,14 @@ const CongNo = () => {
         try {
             const hocKyCode = semester.hocKy;
 
-            const data = await getCongNo(sinhVienData.mssv, sinhVienData.nganh, hocKyCode);
-            setDebtData(data);
+            // Lấy dữ liệu công nợ
+            const debtData = await getCongNo(sinhVienData.mssv, sinhVienData.nganh, hocKyCode);
+            setDebtData(debtData);
+
+            // Lấy dữ liệu khấu trừ
+            const khauTruData = await getKhauTruByMSSV(sinhVienData.mssv);
+            setKhauTruData(khauTruData);
+
         } catch (err) {
             console.error(err);
             setError(err.message);
@@ -110,6 +117,23 @@ const CongNo = () => {
             )}
             {!loading && debtData.length === 0 && selectedSemester && !error && (
                 <Text style={styles.noDataText}>Không có dữ liệu công nợ cho học kỳ này.</Text>
+            )}
+
+            {!loading && khauTruData.length > 0 && (
+                <View style={styles.khauTruContainer}>
+                    <Text style={styles.sectionTitle}>Khấu trừ</Text>
+                    <ScrollView>
+                        {khauTruData.map((item, index) => (
+                            <View style={styles.tableRow} key={item._id || index}>
+                                <Text style={styles.tableCell}>{item.maKhauTru}</Text>
+                                <Text style={styles.tableCell}>{item.soTien.toLocaleString()} VND</Text>
+                            </View>
+                        ))}
+                    </ScrollView>
+                </View>
+            )}
+            {!loading && khauTruData.length === 0 && !error && (
+                <Text style={styles.noDataText}>Không có dữ liệu khấu trừ.</Text>
             )}
         </View>
     );
@@ -247,5 +271,19 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'gray',
         marginTop: 20,
+    },
+    khauTruContainer: {
+        flex: 1,
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 5,
+        marginHorizontal: 20,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: 'black',
     },
 });
