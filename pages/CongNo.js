@@ -1,53 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Modal, FlatList, Button, ScrollView } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
+import { getCongNo } from '../service/congno.service';
+import { useRecoilValue } from 'recoil';
+import { sinhVienDataState } from '../state';
 
 const CongNo = () => {
     const navigation = useNavigation();
+
+    const sinhVienData = useRecoilValue(sinhVienDataState);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState(null);
+    const [debtData, setDebtData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const hocKy = Array.from({ length: 9 }, (_, i) => `Học kỳ ${i + 1}`);
+    const hocKy = [
+        { key: 'Học kỳ 1', hocKy: 'HK1' },
+        { key: 'Học kỳ 2', hocKy: 'HK2' },
+        { key: 'Học kỳ 3', hocKy: 'HK3' },
+        { key: 'Học kỳ 4', hocKy: 'HK4' },
+        { key: 'Học kỳ 5', hocKy: 'HK5' },
+        { key: 'Học kỳ 6', hocKy: 'HK6' },
+        { key: 'Học kỳ 7', hocKy: 'HK7' },
+        { key: 'Học kỳ 8', hocKy: 'HK8' },
+        { key: 'Học kỳ 9', hocKy: 'HK9' },
+    ];
 
-    const chiTietHocPhi = {
-        'Học kỳ 1': {
-            khauTru: 500000,
-            monHoc: [
-                { ten: 'Toán cao cấp', hocPhi: 1500000, daNop: 1000000 },
-                { ten: 'Lý thuyết mạch', hocPhi: 1000000, daNop: 500000 },
-                { ten: 'Hóa học đại cương', hocPhi: 2500000, daNop: 1500000 },
-                // Thêm các môn học khác tương tự
-            ],
-        },
-        'Học kỳ 2': {
-            khauTru: 600000,
-            monHoc: [
-                { ten: 'Vật lý đại cương', hocPhi: 2000000, daNop: 1000000 },
-                { ten: 'Hóa học đại cương', hocPhi: 1500000, daNop: 1000000 },
-                { ten: 'Sinh học đại cương', hocPhi: 2500000, daNop: 2000000 },
-                // Thêm các môn học khác tương tự
-            ],
-        },
-        // Thêm các học kỳ khác tương tự
-    };
-
-    const handleSelectSemester = (semester) => {
-        setSelectedSemester(semester);
+    const handleSelectSemester = async (semester) => {
+        setSelectedSemester(semester.key);
         setModalVisible(false);
-    };
 
-    const calculateDebt = (hocPhi, daNop, khauTru) => {
-        const remainingKhauTru = Math.max(0, khauTru - (hocPhi - daNop));
-        const usedKhauTru = khauTru - remainingKhauTru;
-        return { debt: hocPhi - daNop - usedKhauTru, usedKhauTru, remainingKhauTru };
-    };
+        // Gọi API để lấy danh sách công nợ
+        setLoading(true);
+        setError(null);
+        try {
+            const hocKyCode = semester.hocKy;
 
-    const calculateTotalDebt = (monHoc) => {
-        return monHoc.reduce((total, item) => {
-            const { debt } = calculateDebt(item.hocPhi, item.daNop, chiTietHocPhi[selectedSemester].khauTru);
-            return total + debt;
-        }, 0);
+            const data = await getCongNo(sinhVienData.mssv, sinhVienData.nganh, hocKyCode);
+            setDebtData(data);
+        } catch (err) {
+            console.error(err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -74,13 +72,13 @@ const CongNo = () => {
                     <View style={styles.modalContent}>
                         <FlatList
                             data={hocKy}
-                            keyExtractor={(item) => item}
+                            keyExtractor={(item) => item.key}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
                                     style={styles.modalItem}
                                     onPress={() => handleSelectSemester(item)}
                                 >
-                                    <Text style={styles.modalItemText}>{item}</Text>
+                                    <Text style={styles.modalItemText}>{item.key}</Text>
                                 </TouchableOpacity>
                             )}
                         />
@@ -88,40 +86,30 @@ const CongNo = () => {
                     </View>
                 </View>
             </Modal>
-            {selectedSemester && chiTietHocPhi[selectedSemester] && (
+            {loading && <Text style={styles.loadingText}>Đang tải dữ liệu...</Text>}
+            {error && <Text style={styles.errorText}>Lỗi: {error}</Text>}
+            {!loading && debtData.length > 0 && (
                 <View style={styles.detailsContainer}>
                     <View style={styles.tableHeader}>
-                        <Text style={styles.tableHeaderText}>Mức học phí</Text>
-                        <Text style={styles.tableHeaderText}>Đã nộp</Text>
-                        <Text style={styles.tableHeaderText}>Khấu trừ</Text>
-                        <Text style={styles.tableHeaderText}>Công nợ</Text>
+                        <Text style={styles.tableHeaderText}>Mã môn</Text>
+                        <Text style={styles.tableHeaderText}>Tín chỉ</Text>
+                        <Text style={styles.tableHeaderText}>Số tiền</Text>
+                        <Text style={styles.tableHeaderText}>Trạng thái</Text>
                     </View>
                     <ScrollView style={styles.scrollView}>
-                        {chiTietHocPhi[selectedSemester].monHoc.map((item, index) => {
-                            const { debt, usedKhauTru, remainingKhauTru } = calculateDebt(item.hocPhi, item.daNop, chiTietHocPhi[selectedSemester].khauTru);
-                            chiTietHocPhi[selectedSemester].khauTru = remainingKhauTru;
-                            return (
-                                <View>
-                                    <Text style={styles.subjectName}>{item.ten}</Text>
-                                    <View style={styles.tableRow} key={index}>
-
-                                        <View style={styles.tableCell}>
-
-                                            <Text style={styles.subjectFee}>{item.hocPhi} VND</Text>
-                                        </View>
-                                        <Text style={styles.tableCell}>{item.daNop} VND</Text>
-                                        <Text style={styles.tableCell}>{usedKhauTru} VND</Text>
-                                        <Text style={styles.tableCell}>{debt} VND</Text>
-                                    </View>
-                                </View>
-                            );
-                        })}
+                        {debtData.map((item, index) => (
+                            <View style={styles.tableRow} key={item._id || index}>
+                                <Text style={styles.tableCell}>{item.maMonHoc}</Text>
+                                <Text style={styles.tableCell}>{item.tinChi}</Text>
+                                <Text style={styles.tableCell}>{item.soTien.toLocaleString()} VND</Text>
+                                <Text style={styles.tableCell}>{item.trangThai}</Text>
+                            </View>
+                        ))}
                     </ScrollView>
-                    <View style={styles.totalDebtContainer}>
-                        <Text style={styles.totalDebtText}>Tổng công nợ:</Text>
-                        <Text style={styles.totalDebtAmount}>{calculateTotalDebt(chiTietHocPhi[selectedSemester].monHoc)} VND</Text>
-                    </View>
                 </View>
+            )}
+            {!loading && debtData.length === 0 && selectedSemester && !error && (
+                <Text style={styles.noDataText}>Không có dữ liệu công nợ cho học kỳ này.</Text>
             )}
         </View>
     );
@@ -244,5 +232,20 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'red',
         fontWeight: 'bold',
+    },
+    loadingText: {
+        textAlign: 'center',
+        color: 'blue',
+        marginTop: 20,
+    },
+    errorText: {
+        textAlign: 'center',
+        color: 'red',
+        marginTop: 20,
+    },
+    noDataText: {
+        textAlign: 'center',
+        color: 'gray',
+        marginTop: 20,
     },
 });

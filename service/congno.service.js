@@ -22,3 +22,26 @@ export const getPhieuThuByMSSV = async (MSSV) => {
         throw error; // Ném lỗi để xử lý ở nơi gọi hàm
     }
 };
+
+export const getCongNo = async (mssv, nganh, hocKy) => {
+    try {
+        const url = `${host}/congno/getCongNo/${mssv}/${nganh}/${hocKy}`;
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to fetch công nợ");
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching công nợ:", error);
+        throw error;
+    }
+};
