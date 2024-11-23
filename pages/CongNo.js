@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Modal, FlatList, Button, ScrollView } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
-import { getCongNo, getKhauTruByMSSV } from '../service/congno.service';
+import { getCongNo, getKhauTruByMSSV, thanhToanCongNo } from '../service/congno.service';
 import { useRecoilValue } from 'recoil';
 import { sinhVienDataState } from '../state';
 
@@ -11,7 +11,9 @@ const CongNo = () => {
 
     const sinhVienData = useRecoilValue(sinhVienDataState);
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedSemester, setSelectedSemester] = useState(null);
+    const [modalBankVisible, setModalBankVisible] = useState(false);
+    const [selectedSemester, setSelectedSemester] = useState("");
+    const [selectedBank, setSelectedBank] = useState(null);
     const [debtData, setDebtData] = useState([]);
     const [khauTruData, setKhauTruData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -27,6 +29,13 @@ const CongNo = () => {
         { key: 'Học kỳ 7', hocKy: 'HK7' },
         { key: 'Học kỳ 8', hocKy: 'HK8' },
         { key: 'Học kỳ 9', hocKy: 'HK9' },
+    ];
+
+    const nganHangOptions = [
+        { key: 'Vietcombank', name: 'Vietcombank' },
+        { key: 'Techcombank', name: 'Techcombank' },
+        { key: 'BIDV', name: 'BIDV' },
+        { key: 'Agribank', name: 'Agribank' },
     ];
 
     const handleSelectSemester = async (semester) => {
@@ -56,7 +65,7 @@ const CongNo = () => {
     };
 
     return (
-        <View style={styles.Container}>
+        <ScrollView style={styles.Container}>
             <View style={styles.headerbar}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <AntDesign name="arrowleft" size={24} color="white" />
@@ -111,7 +120,41 @@ const CongNo = () => {
                                 <Text style={styles.tableCell}>{item.soTien.toLocaleString()} VND</Text>
                                 <Text style={styles.tableCell}>{item.trangThai}</Text>
                             </View>
+
                         ))}
+
+                        <TouchableOpacity
+                            style={styles.payButton}
+                            onPress={async () => {
+                                try {
+                                    if (!selectedBank) {
+                                        alert('Vui lòng chọn ngân hàng trước khi thanh toán');
+                                        return;
+                                    }
+                                    if (!selectedSemester) {
+                                        alert('Vui lòng chọn học kỳ trước khi thanh toán');
+                                        return;
+                                    }
+                                    setLoading(true);
+                                    const result = await thanhToanCongNo(
+                                        sinhVienData.mssv,
+                                        sinhVienData.nganh,
+                                        selectedSemester,
+                                        selectedBank
+                                    );
+                                    alert(`Thanh toán thành công: ${result.message}`);
+                                    // Cập nhật lại danh sách công nợ
+                                    handleSelectSemester({ key: selectedSemester, hocKy: result.hocKy });
+                                } catch (err) {
+                                    alert(`Lỗi thanh toán: ${err.message}`);
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }}
+                        >
+                            <Text style={styles.payButtonText}>Thanh Toán</Text>
+                        </TouchableOpacity>
+
                     </ScrollView>
                 </View>
             )}
@@ -135,7 +178,44 @@ const CongNo = () => {
             {!loading && khauTruData.length === 0 && !error && (
                 <Text style={styles.noDataText}>Không có dữ liệu khấu trừ.</Text>
             )}
-        </View>
+
+
+            {/* Modal Ngân Hàng */}
+            <TouchableOpacity style={styles.dropdown} onPress={() => setModalBankVisible(true)}>
+                <Text style={styles.dropdownText}>
+                    {selectedBank ? selectedBank : 'Chọn ngân hàng'}
+                </Text>
+                <AntDesign name="down" size={16} color="black" />
+            </TouchableOpacity>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalBankVisible}
+                onRequestClose={() => setModalBankVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <FlatList
+                            data={nganHangOptions}
+                            keyExtractor={(item) => item.key}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.modalItem}
+                                    onPress={() => {
+                                        setSelectedBank(item.name);
+                                        setModalBankVisible(false);
+                                    }}
+                                >
+                                    <Text style={styles.modalItemText}>{item.name}</Text>
+                                </TouchableOpacity>
+                            )}
+                        />
+                        <Button title="Đóng" onPress={() => setModalBankVisible(false)} />
+                    </View>
+                </View>
+            </Modal>
+        </ScrollView>
     );
 };
 
@@ -285,5 +365,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 10,
         color: 'black',
+    },
+    payButton: {
+        backgroundColor: '#0977FE',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 5,
+    },
+    payButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
 });

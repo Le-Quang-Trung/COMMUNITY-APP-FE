@@ -61,3 +61,26 @@ export const getKhauTruByMSSV = async (MSSV) => {
         throw error; // Để xử lý lỗi ở component sử dụng
     }
 };
+
+export const thanhToanCongNo = async(MSSV, nganh, hocKy, nganHang) => {
+    try {
+        const response = await fetch(`${host}/congno/thanhToan/${MSSV}/${nganh}/${hocKy}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nganHang }), // Truyền thêm thông tin ngân hàng nếu cần
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to process payment');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error in thanhToanCongNo:', error.message);
+        throw error;
+    }
+}
