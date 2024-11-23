@@ -1,16 +1,55 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Button, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getPhieuThuByMSSV } from '../service/congno.service';
+import { useRecoilValue } from 'recoil';
+import { sinhVienDataState } from '../state';
 
-const PhieuThu = () => {
+const PhieuThu = ({ route }) => {
     const navigation = useNavigation();
-    const phieuThuList = [
-        { soPhieu: 'PT001', ngayGioChuyen: '2023-10-01 10:00', nganHang: 'Vietcombank', soTien: '1,000,000 VND' },
-        { soPhieu: 'PT002', ngayGioChuyen: '2023-10-02 11:00', nganHang: 'Techcombank', soTien: '2,000,000 VND' },
-        { soPhieu: 'PT003', ngayGioChuyen: '2023-10-03 12:00', nganHang: 'BIDV', soTien: '3,000,000 VND' },
-        // Thêm các phiếu thu khác tương tự
-    ];
+
+    const sinhVienData = useRecoilValue(sinhVienDataState);
+    const [phieuThuList, setPhieuThuList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+
+    useEffect(() => {
+        const fetchPhieuThu = async () => {
+            try {
+                setLoading(true);
+                const data = await getPhieuThuByMSSV(sinhVienData.mssv);
+                setPhieuThuList(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPhieuThu();
+    }, [sinhVienData.mssv]);
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#0977FE" />
+                <Text>Đang tải dữ liệu...</Text>
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>Lỗi: {error}</Text>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Text style={styles.errorButton}>Quay lại</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -24,13 +63,17 @@ const PhieuThu = () => {
                 {phieuThuList.map((phieu, index) => (
                     <View key={index} style={styles.phieuThuItem}>
                         <View style={styles.row}>
-                            <Text style={styles.phieuThuText}>Số phiếu: {phieu.soPhieu}</Text>
-                            <Text style={styles.phieuThuText}>{phieu.ngayGioChuyen}</Text>
+                            <Text style={styles.phieuThuText}>Số phiếu: {phieu.maPhieuThu}</Text>
+                            <Text style={styles.phieuThuText}>
+                                {new Date(phieu.ngayThu).toLocaleString('vi-VN')}
+                            </Text>
                         </View>
                         <Text style={styles.nganHangText}>{phieu.nganHang}</Text>
                         <View style={styles.row}>
                             <Text style={styles.soTienLabel}>Số tiền:</Text>
-                            <Text style={styles.soTienText}>{phieu.soTien}</Text>
+                            <Text style={styles.soTienText}>
+                                {Number(phieu.soTien).toLocaleString('vi-VN')} VND
+                            </Text>
                         </View>
                         <TouchableOpacity style={styles.button}>
                             <Text style={styles.buttonText}>Xem hóa đơn điện tử</Text>
@@ -99,6 +142,25 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#33CCFF',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
+        fontSize: 18,
+        color: 'red',
+    },
+    errorButton: {
+        fontSize: 16,
+        color: '#0977FE',
+        marginTop: 10,
     },
 });
 
