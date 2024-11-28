@@ -97,7 +97,7 @@ const ThongBao = () => {
         if (user.role === "giảng viên") {
             return (
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoGV')}>
+                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaoThongBaoLHP')}>
                         <Text style={styles.buttonText}>TẠO THÔNG BÁO</Text>
                     </TouchableOpacity>
                 </View>

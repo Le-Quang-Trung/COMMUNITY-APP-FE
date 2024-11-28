@@ -39,3 +39,28 @@ export async function danhGiaHocTap(payload) {
         throw error;
     }
 }
+
+
+export const taoThongBaoLopHP = async (data) => {
+    try {
+        const response = await fetch(`${host}/giangvien/thongBaoLopHP`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Lỗi khi tạo thông báo');
+        }
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error('Error in taoThongBaoLopHP:', error);
+        throw error;
+    }
+};
+

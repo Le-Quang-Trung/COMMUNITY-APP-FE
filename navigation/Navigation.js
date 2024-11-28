@@ -33,6 +33,7 @@ import XemThongTinLopHoc from "../pages/XemThongTinLopHoc.js";
 import TaoLopHocPhan from "../pages/TaoLopHocPhan.js";
 import TaoLichHoc from "../pages/TaoLichHoc.js";
 import TaoThongBaoGV from "../pages/TaoThongBaoGV.js";
+import TaoThongBaoLHP from "../pages/TaoThongBaoLHP.js";
 import XinNghiPhep from "../pages/XinNghiPhep.js";
 
 import DanhSachLopHocPhan from "../pages/DanhSachLopHocPhan.js";
@@ -168,6 +169,7 @@ const Navigation = () => {
         <Stack.Screen name="TaoLopHocPhan" component={TaoLopHocPhan} options={{headerShown: false}}/>
         <Stack.Screen name="TaoLichHoc" component={TaoLichHoc} options={{headerShown: false}}/>
         <Stack.Screen name="TaoThongBaoGV" component={TaoThongBaoGV} options={{headerShown: false}}/>
+        <Stack.Screen name="TaoThongBaoLHP" component={TaoThongBaoLHP} options={{headerShown: false}}/>
         <Stack.Screen name="XinNghiPhep" component={XinNghiPhep} options={{headerShown: false}}/>
         <Stack.Screen name="DanhSachLopHocPhan" component={DanhSachLopHocPhan} options={{headerShown: false}}/>
         <Stack.Screen name="ThemSVVaoLopHP" component={ThemSVVaoLopHP} options={{headerShown: false}}/>
