@@ -22,14 +22,14 @@ const LichHocLichThi = () => {
       try {
         let data;
 
-        if (user.role === 'sinh viên') {
+        if (user.role === 'sinh viên' && sinhVienData?.mssv) {
           // Fetch schedule for student using mssv
           data = await getLichHocByMSSV(sinhVienData.mssv);
-        } else if (user.role === 'giảng viên') {
+        } else if (user.role === 'giảng viên' && giangVienData?.maGV) {
           // Fetch schedule for teacher using maGV
           data = await getLichDayByMaGV(giangVienData.maGV);
         } else {
-          console.warn('Role không xác định');
+          console.warn('Role không xác định hoặc dữ liệu không đầy đủ');
           return;
         }
 
@@ -64,7 +64,8 @@ const LichHocLichThi = () => {
     };
 
     fetchSchedule();
-  }, [user.role, sinhVienData.mssv, giangVienData.maGV]); // Re-run the effect if role, mssv, or maGV changes
+  }, [user.role, sinhVienData?.mssv, giangVienData?.maGV]); // Ensure valid data is available before fetching
+
 
   const startOfWeek = currentDate.clone().startOf('isoWeek');
   const days = [];

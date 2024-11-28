@@ -39,7 +39,7 @@ const CongNo = () => {
     ];
 
     const handleSelectSemester = async (semester) => {
-        setSelectedSemester(semester.key);
+        setSelectedSemester(semester.hocKy);
         setModalVisible(false);
 
         // Gọi API để lấy danh sách công nợ
@@ -162,22 +162,7 @@ const CongNo = () => {
                 <Text style={styles.noDataText}>Không có dữ liệu công nợ cho học kỳ này.</Text>
             )}
 
-            {!loading && khauTruData.length > 0 && (
-                <View style={styles.khauTruContainer}>
-                    <Text style={styles.sectionTitle}>Khấu trừ</Text>
-                    <ScrollView>
-                        {khauTruData.map((item, index) => (
-                            <View style={styles.tableRow} key={item._id || index}>
-                                <Text style={styles.tableCell}>{item.maKhauTru}</Text>
-                                <Text style={styles.tableCell}>{item.soTien.toLocaleString()} VND</Text>
-                            </View>
-                        ))}
-                    </ScrollView>
-                </View>
-            )}
-            {!loading && khauTruData.length === 0 && !error && (
-                <Text style={styles.noDataText}>Không có dữ liệu khấu trừ.</Text>
-            )}
+
 
 
             {/* Modal Ngân Hàng */}
@@ -215,6 +200,22 @@ const CongNo = () => {
                     </View>
                 </View>
             </Modal>
+            {!loading && khauTruData.length > 0 && (
+                <View style={styles.khauTruContainer}>
+                    <Text style={styles.sectionTitle}>Khấu trừ</Text>
+                    <ScrollView>
+                        {khauTruData.map((item, index) => (
+                            <View style={styles.tableRow} key={item._id || index}>
+                                <Text style={styles.tableCell}>{item.maKhauTru}</Text>
+                                <Text style={styles.tableCell}>{item.soTien.toLocaleString()} VND</Text>
+                            </View>
+                        ))}
+                    </ScrollView>
+                </View>
+            )}
+            {!loading && khauTruData.length === 0 && !error && (
+                <Text style={styles.noDataText}>Không có dữ liệu khấu trừ.</Text>
+            )}
         </ScrollView>
     );
 };

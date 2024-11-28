@@ -26,7 +26,11 @@ const TraCuu = () => {
                 <Text style={styles.optionText}>Xin nghỉ phép</Text>
                 <Image source={require('../assets/images/tra-cuu-thong-tin.png')} style={styles.optionImage} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.optionContainer}>
+            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('PhieuThu')}>
+                <Text style={styles.optionText}>Xem phiếu thu</Text>
+                <Image source={require('../assets/images/tra-cuu-thong-tin.png')} style={styles.optionImage} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.optionContainer} onPress={() => navigation.navigate('CongNo')}>
                 <Text style={styles.optionText}>Thanh toán học phí</Text>
                 <Image source={require('../assets/images/thanh-toan-hoc-phi.png')} style={styles.optionImage} />
             </TouchableOpacity>

@@ -56,7 +56,7 @@ const TaoLopHocPhan = () => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput 
-                    placeholder="Nhập tên lớp học" 
+                    placeholder="Nhập tên lớp học (16ATT)" 
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
                     value={tenLop}
@@ -84,7 +84,7 @@ const TaoLopHocPhan = () => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput 
-                    placeholder="Nhập ngành" 
+                    placeholder="Nhập ngành: Kỹ Thuật Phần Mềm, v.v..." 
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
                     value={nganh}
