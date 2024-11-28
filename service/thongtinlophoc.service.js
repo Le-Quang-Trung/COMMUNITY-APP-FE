@@ -20,3 +20,25 @@ export const getTTLopHocPhan = async (maGV) => {
         throw error;
     }
 };
+
+export const getDanhSachSinhVien = async (maLHP) => {
+    try {
+        const response = await fetch(`${host}/thongtinlophoc/getDanhSachSinhVien/${maLHP}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to fetch student list');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching student list:', error);
+        throw error;
+    }
+};

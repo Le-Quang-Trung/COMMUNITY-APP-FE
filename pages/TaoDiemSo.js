@@ -7,7 +7,7 @@ import { getMonHocById } from "../service/monhoc.service";
 
 const TaoDiemSo = ({ route }) => {
     const navigation = useNavigation();
-    const { maMonHoc, tenLHP } = route.params;
+    const { maMonHoc, tenLHP, mssv } = route.params;
 
     // State variables
     const [monHocData, setMonHocData] = useState("");  
@@ -17,7 +17,6 @@ const TaoDiemSo = ({ route }) => {
     const [diemTK3, setDiemTK3] = useState('');
     const [diemGK, setDiemGK] = useState('');
     const [diemCK, setDiemCK] = useState('');
-    const [MSSV, setMSSV] = useState('');
 
      // Fetch MonHoc data when component mounts or maMonHoc changes
      useEffect(() => {
@@ -39,7 +38,7 @@ const TaoDiemSo = ({ route }) => {
             lopHoc: tenLHP,
             monHoc: monHocData?.tenMonHoc,
             maMonHoc: maMonHoc,
-            MSSV,
+            MSSV: mssv,
             diemTK1: diemTK1 || null,
             diemTK2: diemTK2 || null,
             diemTK3: diemTK3 || null,
@@ -80,16 +79,7 @@ const TaoDiemSo = ({ route }) => {
             </View>
 
             <View style={[styles.row, { marginTop: 20 }]}>
-                <Text style={styles.label}>Mã Số Sinh Viên:</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder="Nhập mã số sinh viên"
-                    placeholderTextColor="#D9D9D9"
-                    style={[styles.input, styles.inputBorder]}
-                    value={MSSV}
-                    onChangeText={setMSSV}
-                />
+                <Text style={styles.label}>Mã Số Sinh Viên: {mssv}</Text>
             </View>
 
             <View style={[styles.row, { marginTop: 20 }]}>

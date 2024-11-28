@@ -45,43 +45,23 @@ const XemThongTinLopHoc = () => {
             <View style={styles.courseItem}>
                 <Text style={styles.courseName}>{item.tenLHP}</Text>
                 <Text style={styles.courseCode}>Mã môn học: {item.maMonHoc}</Text>
-                {item.sinhVien.length > 0 ? (
-                    <Text style={styles.enrollment}>Sĩ số: {item.sinhVien.length} sinh viên</Text>
-                ) : (
-                    <Text style={styles.noStudents}>Chưa có sinh viên đăng ký</Text>
-                )}
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('DanhSachSinhVienLHP', {
+                        maLHP: item.maLHP, maMonHoc: item.maMonHoc,
+                        tenLHP: item.tenLHP,
+                    })}
+                >
+                    {item.sinhVien.length > 0 ? (
+                        <Text style={styles.enrollment}>Sĩ số: {item.sinhVien.length} sinh viên</Text>
+                    ) : (
+                        <Text style={styles.noStudents}>Chưa có sinh viên đăng ký</Text>
+                    )}
+                </TouchableOpacity>
                 {item.lichHoc.length > 0 ? (
                     <Text style={styles.schedule}>Lịch học: {item.lichHoc.join(', ')}</Text>
                 ) : (
                     <Text style={styles.noSchedule}>Chưa có lịch học</Text>
                 )}
-                <View style={styles.buttonContainer}>
-                    {/* Nút "Thêm Sinh viên" */}
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() =>
-                            navigation.navigate('TaoDiemSo', {
-                                maMonHoc: item.maMonHoc,
-                                tenLHP: item.tenLHP,
-                            })
-                        }
-                    >
-                        <Text style={styles.buttonText}>Tạo Điểm Số</Text>
-                    </TouchableOpacity>
-
-                    {/* Nút "Tạo Lịch học" */}
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() =>
-                            navigation.navigate('CapNhatDiemSo', {
-                                maMonHoc: item.maMonHoc,
-                                tenLHP: item.tenLHP,
-                            })
-                        }
-                    >
-                        <Text style={styles.buttonText}>Cập Nhật Điểm Số</Text>
-                    </TouchableOpacity>
-                </View>
             </View>
         );
     };
@@ -162,24 +142,6 @@ const styles = StyleSheet.create({
     schedule: { fontSize: 14, color: '#555' },
     noSchedule: { fontSize: 14, color: 'orange' },
     errorText: { color: 'red', fontSize: 16, textAlign: 'center', marginTop: 20 },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    button: {
-        marginTop: 20,
-        width: '40%',
-        height: 40,
-        backgroundColor: '#fff',
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(58, 131, 244, 0.4)',
-        justifyContent: 'center',
-    },
-    buttonText: {
-        color: 'black',
-        textAlign: 'center',
-    },
 });
 
 export default XemThongTinLopHoc;
