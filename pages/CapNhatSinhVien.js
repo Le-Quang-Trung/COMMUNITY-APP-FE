@@ -1,18 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert, ScrollView } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { addSinhVien } from "../service/sinhvien.service";
+import { updateSinhVien, getSinhVienByMSSV } from "../service/sinhvien.service";
 
-const ThongTinSinhVien = () => {
+const CapNhatSinhVien = ({ route }) => {
     const navigation = useNavigation();
-    
+    const {mssv } = route.params;
     // State để lưu dữ liệu
     const [hoTen, setHoTen] = useState('');
     const [trangThai, setTrangThai] = useState('');
     const [gioiTinh, setGioiTinh] = useState('');
     const [ngaySinh, setNgaySinh] = useState('');
-    const [mssv, setMssv] = useState('');
     const [lop, setLop] = useState('');
     const [bacDaoTao, setBacDaoTao] = useState('');
     const [khoa, setKhoa] = useState('');
@@ -20,14 +19,53 @@ const ThongTinSinhVien = () => {
     const [diaChi, setDiaChi] = useState('');
     const [soDT, setSoDT] = useState('');
 
-    const handleThemSinhVien = async () => {
-        // Chuẩn bị dữ liệu để gửi
-        const sinhVienData = {
+
+    const formatDate = (date) => {
+        const d = new Date(date);
+        const day = d.getDate().toString().padStart(2, '0'); // Thêm số 0 vào trước nếu ngày chỉ có 1 chữ số
+        const month = (d.getMonth() + 1).toString().padStart(2, '0'); // Thêm số 0 vào trước nếu tháng chỉ có 1 chữ số
+        const year = d.getFullYear();
+        return `${day}-${month}-${year}`; // Định dạng ngày theo dd-MM-yyyy
+    };
+
+    // Fetch student data when MSSV changes or component mounts
+    useEffect(() => {
+        if (mssv) {
+            const fetchStudentData = async () => {
+                try {
+                    const student = await getSinhVienByMSSV(mssv);
+                    // Set form fields with the fetched student data
+                    setHoTen(student.hoTen || '');
+                    setTrangThai(student.trangThai || '');
+                    setGioiTinh(student.gioiTinh || '');
+                    setNgaySinh(student.ngaySinh ? formatDate(student.ngaySinh) : '');
+                    setLop(student.lop || '');
+                    setBacDaoTao(student.bacDaoTao || '');
+                    setKhoa(student.khoa || '');
+                    setNganh(student.nganh || '');
+                    setDiaChi(student.diaChi || '');
+                    setSoDT(student.soDT || '');
+                } catch (error) {
+                    Alert.alert('Lỗi', 'Không thể lấy thông tin sinh viên.');
+                }
+            };
+
+            fetchStudentData();
+        }
+    }, [mssv]); // Effect runs when MSSV changes
+
+    const handleCapNhatSinhVien = async () => {
+        const formatDateToISO = (dateString) => {
+            const [day, month, year] = dateString.split('-');
+            const date = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
+            return date.toISOString();
+        };
+
+        const updatedData = {
             hoTen,
             trangThai,
             gioiTinh,
-            ngaySinh,
-            mssv,
+            ngaySinh: formatDateToISO(ngaySinh),
             lop,
             bacDaoTao,
             khoa,
@@ -35,16 +73,15 @@ const ThongTinSinhVien = () => {
             diaChi,
             soDT,
         };
-
+    
         try {
-            await addSinhVien(sinhVienData);
-            Alert.alert('Thành công', 'Sinh viên được thêm thành công!');
+            await updateSinhVien(mssv, updatedData);
+            Alert.alert('Thành công', 'Cập nhật thông tin sinh viên thành công!');
             navigation.goBack(); // Quay lại trang trước
         } catch (error) {
-            Alert.alert('Lỗi', error.message || 'Có lỗi xảy ra khi thêm sinh viên');
+            Alert.alert('Lỗi', error.message || 'Có lỗi xảy ra khi cập nhật thông tin sinh viên');
         }
     };
-
 
     return (
         <ScrollView style={styles.container}>
@@ -56,16 +93,16 @@ const ThongTinSinhVien = () => {
                     onPress={() => navigation.goBack()} 
                     style={styles.searchIcon} 
                 />
-                <Text style={styles.title}>Thông Tin Sinh Viên</Text>
+                <Text style={styles.title}>Cập Nhật Thông Tin Sinh Viên</Text>
             </View>
 
             {/* Form nhập liệu */}
-            {[
+            {[ 
+                { label: 'Mã Số Sinh Viên', value: mssv },
                 { label: 'Họ tên', value: hoTen, onChange: setHoTen },
                 { label: 'Trạng Thái', value: trangThai, onChange: setTrangThai },
                 { label: 'Giới tính', value: gioiTinh, onChange: setGioiTinh },
-                { label: 'Ngày Sinh', value: ngaySinh, onChange: setNgaySinh },
-                { label: 'Mã Số Sinh Viên', value: mssv, onChange: setMssv },
+                { label: 'Ngày Sinh', value: ngaySinh, onChange: setNgaySinh  },
                 { label: 'Lớp', value: lop, onChange: setLop },
                 { label: 'Bậc Đào Tạo', value: bacDaoTao, onChange: setBacDaoTao },
                 { label: 'Khoa', value: khoa, onChange: setKhoa },
@@ -91,15 +128,15 @@ const ThongTinSinhVien = () => {
 
             {/* Nút thêm sinh viên */}
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleThemSinhVien}>
-                    <Text style={styles.buttonText}>THÊM SINH VIÊN</Text>
+                <TouchableOpacity style={styles.button} onPress={handleCapNhatSinhVien}>
+                    <Text style={styles.buttonText}>CẬP NHẬT SINH VIÊN</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
     );
 };
 
-export default ThongTinSinhVien;
+export default CapNhatSinhVien;
 
 const styles = StyleSheet.create({
     container: {

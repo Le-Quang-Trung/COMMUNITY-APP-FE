@@ -79,7 +79,7 @@ const DiemHocKy = () => {
             </Modal>
 
             {loading && <ActivityIndicator size="large" color="#0000ff" />}
-            {error && <Text style={styles.errorText}>Error: {error}</Text>}
+            {error && <Text style={styles.errorText}>{error}</Text>}
 
             {/* Hiển thị môn học và điểm học kỳ nếu có */}
             {semesterData && (

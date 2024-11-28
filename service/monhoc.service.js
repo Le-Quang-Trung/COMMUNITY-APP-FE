@@ -7,7 +7,7 @@ export const getMonHocByHocKy = async (mssv, hocky) => {
     const response = await fetch(`${host}/monhoc/getMonHoc/${mssv}/${hocky}`);
     
     if (!response.ok) {
-      throw new Error('Lỗi khi lấy dữ liệu môn học');
+      throw new Error('Không có dữ liệu môn học');
     }
 
     const data = await response.json(); 

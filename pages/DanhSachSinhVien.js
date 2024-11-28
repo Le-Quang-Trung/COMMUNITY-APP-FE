@@ -52,15 +52,15 @@ const DanhSachSinhVien = () => {
             <Text style={styles.hoTen}>{item.hoTen}</Text>
             <Text style={styles.mssv}>MSSV: {item.mssv}</Text>
             <Text style={styles.nganh}>Ngành: {item.nganh}</Text>
-            {/* <TouchableOpacity
-                style={{ marginTop: 5, backgroundColor: 'red', padding: 10 }}
-                onPress={() => handleDeleteSinhVien(item._id)}
-            >
-                <Text style={{ color: 'white' }}>Xóa</Text>
-            </TouchableOpacity> */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={() => handleDeleteSinhVien(item._id)}>
                     <Text style={styles.buttonText}>XÓA SINH VIÊN</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button}
+                    onPress={() => navigation.navigate('CapNhatSinhVien', {
+                        mssv: item.mssv,
+                    })}>
+                    <Text style={styles.buttonText}>CẬP NHẬT SINH VIÊN</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
@@ -134,19 +134,18 @@ const styles = StyleSheet.create({
         color: '#888',
     },
     buttonContainer: {
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
     },
     button: {
-        width: '80%',
+        marginTop: 20,
+        width: '40%',
         height: 40,
         backgroundColor: '#fff',
         borderRadius: 20,
         borderWidth: 1,
         borderColor: 'red',
         justifyContent: 'center',
-        marginTop: 15
     },
     buttonText: {
         color: 'black',

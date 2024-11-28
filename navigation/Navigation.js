@@ -24,6 +24,7 @@ import TraCuuThongTin from "../pages/TraCuuThongTin.js";
 import DoiMatKhau from "../pages/DoiMatKhau.js";
 import TaoTaiKhoan from "../pages/TaoTaiKhoan.js";
 import ThongTinSinhVien from "../pages/ThongTinSinhVien.js";
+import CapNhatSinhVien from "../pages/CapNhatSinhVien.js";
 import DanhSachSinhVien from "../pages/DanhSachSinhVien.js";
 import DanhSachSinhVienLHP from "../pages/DanhSachSinhVienLHP.js";
 
@@ -163,6 +164,7 @@ const Navigation = () => {
         <Stack.Screen name="DoiMatKhau" component={DoiMatKhau} options={{headerShown: false}}/>
         <Stack.Screen name="TaoTaiKhoan" component={TaoTaiKhoan} options={{headerShown: false}}/>
         <Stack.Screen name="ThongTinSinhVien" component={ThongTinSinhVien} options={{headerShown: false}}/>
+        <Stack.Screen name="CapNhatSinhVien" component={CapNhatSinhVien} options={{headerShown: false}}/>
         <Stack.Screen name="DanhSachSinhVien" component={DanhSachSinhVien} options={{headerShown: false}}/>
         <Stack.Screen name="DanhSachSinhVienLHP" component={DanhSachSinhVienLHP} options={{headerShown: false}}/>
         <Stack.Screen name="TaoDiemSo" component={TaoDiemSo} options={{headerShown: false}}/>

@@ -43,7 +43,7 @@ const PhieuThu = ({ route }) => {
     if (error) {
         return (
             <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Lỗi: {error}</Text>
+                <Text style={styles.errorText}>Không có phiếu thu nào</Text>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Text style={styles.errorButton}>Quay lại</Text>
                 </TouchableOpacity>
@@ -75,9 +75,6 @@ const PhieuThu = ({ route }) => {
                                 {Number(phieu.soTien).toLocaleString('vi-VN')} VND
                             </Text>
                         </View>
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}>Xem hóa đơn điện tử</Text>
-                        </TouchableOpacity>
                     </View>
                 ))}
             </ScrollView>
@@ -133,15 +130,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'orange',
         fontWeight: 'bold',
-    },
-    button: {
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    buttonText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#33CCFF',
     },
     loadingContainer: {
         flex: 1,

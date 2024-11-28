@@ -74,6 +74,17 @@ const ThongBao = () => {
         );
     }
 
+
+    if (user.role === 'quản lý') {
+        return (
+            <View style={styles.Container}>
+                <Text style={styles.textHeader}>Thông Báo</Text>
+                <Text style={styles.notificationContainer}>Không có thông báo nào.</Text>
+            </View>
+        );
+    }
+
+
     if (notifications.length === 0) {
         return (
             <View style={styles.Container}>

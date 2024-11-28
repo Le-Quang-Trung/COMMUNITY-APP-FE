@@ -23,6 +23,10 @@ const DangNhap = ({ route }) => {
 
     // Hàm handleLogin điều chỉnh để gọi API đúng dựa vào role
     const handleLogin = async () => {
+        if (tenTaiKhoan === '' || matKhau === '') {
+            Alert.alert('Vui lòng nhập đầy đủ thông tin');
+            return;
+        }
         try {
             let userData;
             if (role === 'sinh viên') {
@@ -35,7 +39,7 @@ const DangNhap = ({ route }) => {
             setUserState({ role, data: userData });
             navigation.navigate('TabScreen');
         } catch (error) {
-            Alert.alert('Lỗi', error.message);
+            Alert.alert('Lỗi: Vui lòng đăng nhập lại');
         }
     };
 
