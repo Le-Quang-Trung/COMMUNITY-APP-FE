@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
-import { capNhatDiem } from "../service/diemso.service";
+import { capNhatDiem, getDiemSo } from "../service/diemso.service";
 import { getMonHocById } from "../service/monhoc.service";
+
 const CapNhatDiemSo = ({ route }) => {
     const navigation = useNavigation();
     const { maMonHoc, tenLHP, mssv } = route.params;
 
     // State variables
     const [monHocData, setMonHocData] = useState("");
-
     const [diemTK1, setDiemTK1] = useState('');
     const [diemTK2, setDiemTK2] = useState('');
     const [diemTK3, setDiemTK3] = useState('');
@@ -21,8 +21,8 @@ const CapNhatDiemSo = ({ route }) => {
     useEffect(() => {
         const fetchMonHocData = async () => {
             try {
-                const data = await getMonHocById(maMonHoc);  // Call the API
-                setMonHocData(data);  // Set the fetched data
+                const data = await getMonHocById(maMonHoc);  // Fetch MonHoc data
+                setMonHocData(data);  // Set MonHoc data
             } catch (error) {
                 console.error('Error fetching MonHoc:', error);
                 Alert.alert('Lỗi', 'Không thể lấy thông tin môn học');
@@ -31,6 +31,26 @@ const CapNhatDiemSo = ({ route }) => {
         fetchMonHocData();
     }, [maMonHoc]);
 
+    // Fetch student's current scores when component mounts
+    useEffect(() => {
+        const fetchDiemSo = async () => {
+            try {
+                const data = await getDiemSo(mssv, maMonHoc, tenLHP);
+                setDiemTK1(data.diemTK1 || '');
+                setDiemTK2(data.diemTK2 || '');
+                setDiemTK3(data.diemTK3 || '');
+                setDiemGK(data.diemGK || '');
+                setDiemCK(data.diemCK || '');
+            } catch (error) {
+                console.error('Error fetching Diem So:', error);
+                Alert.alert('Lỗi', 'Không thể lấy điểm số của sinh viên');
+            }
+        };
+
+        fetchDiemSo();
+    }, [mssv, maMonHoc, tenLHP]);
+
+    // Handle the form submission to update scores
     const handleCapNhatDiemSo = async () => {
         const diemSoData = {
             lopHoc: tenLHP,
@@ -78,16 +98,16 @@ const CapNhatDiemSo = ({ route }) => {
             <View style={[styles.row, { marginTop: 20 }]}>
                 <Text style={styles.label}>Mã Số Sinh Viên: {mssv}</Text>
             </View>
+
+            {/* Input fields for scores */}
             <View style={[styles.row, { marginTop: 20 }]}>
                 <Text style={styles.label}>Điểm TK1:</Text>
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    placeholder="Nhập điểm TK1"
-                    placeholderTextColor="#D9D9D9"
+                    value={diemTK1 ? diemTK1.toString() : ''} 
+                    onChangeText={setDiemTK1} 
                     style={[styles.input, styles.inputBorder]}
-                    value={diemTK1}
-                    onChangeText={setDiemTK1}
                 />
             </View>
 
@@ -96,11 +116,9 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    placeholder="Nhập điểm TK2"
-                    placeholderTextColor="#D9D9D9"
+                    value={diemTK2 ? diemTK2.toString() : ''} 
+                    onChangeText={setDiemTK2} 
                     style={[styles.input, styles.inputBorder]}
-                    value={diemTK2}
-                    onChangeText={setDiemTK2}
                 />
             </View>
 
@@ -109,11 +127,9 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    placeholder="Nhập điểm TK3"
-                    placeholderTextColor="#D9D9D9"
+                    value={diemTK3 ? diemTK3.toString() : ''} 
+                    onChangeText={setDiemTK3} 
                     style={[styles.input, styles.inputBorder]}
-                    value={diemTK3}
-                    onChangeText={setDiemTK3}
                 />
             </View>
 
@@ -122,11 +138,9 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    placeholder="Nhập điểm GK"
-                    placeholderTextColor="#D9D9D9"
-                    style={[styles.input, styles.inputBorder]}
-                    value={diemGK}
+                    value={diemGK ? diemGK.toString() : ''} 
                     onChangeText={setDiemGK}
+                    style={[styles.input, styles.inputBorder]}
                 />
             </View>
 
@@ -135,15 +149,13 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    placeholder="Nhập điểm CK"
-                    placeholderTextColor="#D9D9D9"
+                    value={diemCK ? diemCK.toString() : ''} 
+                    onChangeText={setDiemCK} 
                     style={[styles.input, styles.inputBorder]}
-                    value={diemCK}
-                    onChangeText={setDiemCK}
                 />
             </View>
 
-            {/* Nút gửi */}
+            {/* Submit button */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleCapNhatDiemSo}>
                     <Text style={styles.buttonText}>CẬP NHẬT ĐIỂM SỐ</Text>
