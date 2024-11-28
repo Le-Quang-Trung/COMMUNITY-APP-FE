@@ -141,7 +141,7 @@ const CongNo = () => {
                                         selectedSemester,
                                         selectedBank
                                     );
-                                    alert(`Thanh toán thành công: ${result.message}`);
+                                    alert(`${result.message}`);
                                     // Cập nhật lại danh sách công nợ
                                     handleSelectSemester({ key: selectedSemester, hocKy: result.hocKy });
                                 } catch (err) {
