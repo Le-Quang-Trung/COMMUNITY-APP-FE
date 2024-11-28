@@ -169,7 +169,6 @@ const functionsDataQL = [
     { title: 'Danh sách sinh viên', iconComponent: () => <Ionicons name="duplicate-outline" size={40} color="green" />, navigateTo: 'DanhSachSinhVien' },
     { title: 'Danh sách lớp học phần', iconComponent: () => <Ionicons name="duplicate-outline" size={40} color="lightblue" />, navigateTo: 'DanhSachLopHocPhan' },
     { title: 'Thông tin sinh viên', iconComponent: () => <Ionicons name="apps" size={40} color="blue" />, navigateTo: 'ThongTinSinhVien' },
-    { title: 'Tạo tài khoản cho sinh viên', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="orange" />, navigateTo: 'TaoTaiKhoan' },
     { title: 'Tạo lớp học phần', iconComponent: () => <Ionicons name="add-circle-outline" size={40} color="red" />, navigateTo: 'TaoLopHocPhan' },
 ];
 

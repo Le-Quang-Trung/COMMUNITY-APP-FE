@@ -3,6 +3,7 @@ import { Text, View, TouchableOpacity, TextInput, StyleSheet, Alert, ScrollView 
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { addSinhVien } from "../service/sinhvien.service";
+import { createAccount } from "../service/taikhoan.service";
 
 const ThongTinSinhVien = () => {
     const navigation = useNavigation();
@@ -37,14 +38,19 @@ const ThongTinSinhVien = () => {
         };
 
         try {
+            // Thêm sinh viên
             await addSinhVien(sinhVienData);
-            Alert.alert('Thành công', 'Sinh viên được thêm thành công!');
+
+            // Tạo tài khoản với MSSV là tên tài khoản và mật khẩu mặc định '1111'
+            const matKhau = '1111';
+            await createAccount(mssv, matKhau); // Tạo tài khoản sử dụng mã sinh viên
+
+            Alert.alert('Thành công', 'Sinh viên và tài khoản đã được tạo thành công!');
             navigation.goBack(); // Quay lại trang trước
         } catch (error) {
-            Alert.alert('Lỗi', error.message || 'Có lỗi xảy ra khi thêm sinh viên');
+            Alert.alert('Lỗi', error.message || 'Có lỗi xảy ra khi thêm sinh viên hoặc tạo tài khoản');
         }
     };
-
 
     return (
         <ScrollView style={styles.container}>
@@ -60,7 +66,7 @@ const ThongTinSinhVien = () => {
             </View>
 
             {/* Form nhập liệu */}
-            {[
+            {[ 
                 { label: 'Họ tên', value: hoTen, onChange: setHoTen },
                 { label: 'Trạng Thái', value: trangThai, onChange: setTrangThai },
                 { label: 'Giới tính', value: gioiTinh, onChange: setGioiTinh },
@@ -89,7 +95,7 @@ const ThongTinSinhVien = () => {
                 </View>
             ))}
 
-            {/* Nút thêm sinh viên */}
+            {/* Nút thêm sinh viên và tạo tài khoản */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleThemSinhVien}>
                     <Text style={styles.buttonText}>THÊM SINH VIÊN</Text>
