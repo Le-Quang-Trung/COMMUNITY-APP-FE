@@ -17,6 +17,64 @@ const DiemMonHoc = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Tính điểm tổng kết thang 10
+    const calculateTotalScore = (diemTK1, diemTK2, diemTK3, diemGK, diemCK) => {
+        const tbThuongKy = (diemTK1 + diemTK2 + diemTK3) / 3;
+        const diemTongKet10 = ((tbThuongKy * 20) + (diemGK * 30) + (diemCK * 50)) / 100;
+
+        // Quy đổi điểm thang 10 sang thang điểm 4
+        const diemThang4 = ((diemTongKet10 - 5) / 5) * 4;
+
+        // Xác định điểm chữ
+        let letterGrade = '';
+        if (diemTongKet10 >= 9.0) {
+            letterGrade = 'A+';
+        } else if (diemTongKet10 >= 8.5) {
+            letterGrade = 'A';
+        } else if (diemTongKet10 >= 8.0) {
+            letterGrade = 'B+';
+        } else if (diemTongKet10 >= 7.0) {
+            letterGrade = 'B';
+        } else if (diemTongKet10 >= 6.0) {
+            letterGrade = 'C+';
+        } else if (diemTongKet10 >= 5.5) {
+            letterGrade = 'C';
+        } else if (diemTongKet10 >= 5.0) {
+            letterGrade = 'D+';
+        }
+
+        // Xếp loại
+        const classification = calculateClassification(letterGrade);
+
+        return {
+            diemTongKet10,
+            diemThang4,
+            letterGrade,
+            classification
+        };
+    };
+
+    const calculateClassification = (letterGrade) => {
+        switch (letterGrade) {
+            case 'A+':
+                return 'Xuất sắc';
+            case 'A':
+                return 'Giỏi';
+            case 'B+':
+                return 'Khá Giỏi';
+            case 'B':
+                return 'Khá';
+            case 'C+':
+                return 'Trung Bình Khá';
+            case 'C':
+                return 'Trung Bình';
+            case 'D+':
+                return 'Trung Bình';
+            default:
+                return 'Chưa xếp loại';
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -40,10 +98,6 @@ const DiemMonHoc = () => {
         fetchData();
     }, [sinhVienData.mssv, subject.maMonHoc]); // Only depend on mssv and maMonHoc
 
-    console.log("aaa", subject)
-    console.log("bbb", subjectDetails)
-    console.log("ccc", diemSo)
-
     if (loading) {
         return (
             <View style={styles.container}>
@@ -60,6 +114,14 @@ const DiemMonHoc = () => {
         );
     }
 
+    // Calculate scores
+    const { diemTongKet10, diemThang4, letterGrade, classification } = calculateTotalScore(
+        diemSo.diemTK1,
+        diemSo.diemTK2,
+        diemSo.diemTK3,
+        diemSo.diemGK,
+        diemSo.diemCK
+    );
 
     return (
         <View style={styles.Container}>
@@ -72,7 +134,6 @@ const DiemMonHoc = () => {
             <View style={styles.content}>
                 <View style={styles.subjectRow}>
                     <Text style={styles.subjectName}>{diemSo.monHoc}</Text>
-                    {/* <Text style={styles.credits}>{diemSo.credits} tín chỉ</Text> */}
                 </View>
                 <View style={styles.detailsContainer}>
                     {subjectDetails && (
@@ -97,22 +158,22 @@ const DiemMonHoc = () => {
                                 <Text style={styles.detailLabel}>Cuối kỳ:</Text>
                                 <Text style={styles.detailValue}>{diemSo.diemCK}</Text>
                             </View>
-                            {/* <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Điểm trung bình (thang 10):</Text>
-                                <Text style={styles.detailValue}>{subjectDetails.gpa10}</Text>
+                            <View style={styles.detailRow}>
+                                <Text style={styles.detailLabel}>Điểm tổng kết (thang 10):</Text>
+                                <Text style={styles.detailValue}>{diemTongKet10.toFixed(2)}</Text>
                             </View>
                             <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Điểm trung bình (thang 4):</Text>
-                                <Text style={styles.detailValue}>{subjectDetails.gpa4}</Text>
+                                <Text style={styles.detailLabel}>Thang điểm 4:</Text>
+                                <Text style={styles.detailValue}>{diemThang4.toFixed(2)}</Text>
                             </View>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>Điểm chữ:</Text>
-                                <Text style={styles.detailValue}>{subjectDetails.letterGrade}</Text>
+                                <Text style={styles.detailValue}>{letterGrade}</Text>
                             </View>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>Xếp loại:</Text>
-                                <Text style={styles.detailValue}>{subjectDetails.classification}</Text>
-                            </View> */}
+                                <Text style={styles.detailValue}>{classification}</Text>
+                            </View>
                         </>
                     )}
                 </View>
