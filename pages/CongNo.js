@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, Modal, FlatList, Button, ScrollView } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Text, Modal, FlatList, Button, ScrollView } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
 import { getCongNo, getKhauTruByMSSV, thanhToanCongNo } from '../service/congno.service';
 import { useRecoilValue } from 'recoil';
 import { sinhVienDataState } from '../state';
+import { openBrowserAsync } from 'expo-web-browser';
 
 const CongNo = () => {
     const navigation = useNavigation();
-
     const sinhVienData = useRecoilValue(sinhVienDataState);
+
     const [modalVisible, setModalVisible] = useState(false);
-    const [modalBankVisible, setModalBankVisible] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState("");
-    const [selectedBank, setSelectedBank] = useState(null);
     const [debtData, setDebtData] = useState([]);
     const [khauTruData, setKhauTruData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isPaying, setIsPaying] = useState(false);
     const [error, setError] = useState(null);
 
     const hocKy = [
@@ -31,12 +31,6 @@ const CongNo = () => {
         { key: 'Học kỳ 9', hocKy: 'HK9' },
     ];
 
-    const nganHangOptions = [
-        { key: 'Vietcombank', name: 'Vietcombank' },
-        { key: 'Techcombank', name: 'Techcombank' },
-        { key: 'BIDV', name: 'BIDV' },
-        { key: 'Agribank', name: 'Agribank' },
-    ];
 
     const handleSelectSemester = async (semester) => {
         setSelectedSemester(semester.hocKy);
@@ -60,6 +54,35 @@ const CongNo = () => {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handlePayment = async () => {
+        if (!selectedSemester) {
+            alert('Vui lòng chọn học kỳ trước khi thanh toán.');
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            setIsPaying(true);
+    
+            const result = await thanhToanCongNo(sinhVienData.mssv, sinhVienData.nganh, selectedSemester);
+            console.log('Payment result:', result);
+
+            if (result) {
+                openBrowserAsync(result); // Open URL in browser
+            } else {
+                alert(result.message || 'Thanh toán thành công!');
+            }
+    
+            // Refresh debt data after payment
+            handleSelectSemester({ hocKy: selectedSemester });
+        } catch (err) {
+            alert(`Lỗi thanh toán: ${err.message || 'Có lỗi xảy ra'}`);
+        } finally {
+            setLoading(false);
+            setIsPaying(false);
         }
     };
 
@@ -121,35 +144,10 @@ const CongNo = () => {
                             </View>
 
                         ))}
-
                         <TouchableOpacity
-                            style={styles.payButton}
-                            onPress={async () => {
-                                try {
-                                    if (!selectedBank) {
-                                        alert('Vui lòng chọn ngân hàng trước khi thanh toán');
-                                        return;
-                                    }
-                                    if (!selectedSemester) {
-                                        alert('Vui lòng chọn học kỳ trước khi thanh toán');
-                                        return;
-                                    }
-                                    setLoading(true);
-                                    const result = await thanhToanCongNo(
-                                        sinhVienData.mssv,
-                                        sinhVienData.nganh,
-                                        selectedSemester,
-                                        selectedBank
-                                    );
-                                    alert(`${result.message}`);
-                                    // Cập nhật lại danh sách công nợ
-                                    handleSelectSemester({ key: selectedSemester, hocKy: result.hocKy });
-                                } catch (err) {
-                                    alert(`Lỗi thanh toán: ${err.message}`);
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }}
+                            style={[styles.payButton, isPaying && styles.disabledPayButton]}
+                            onPress={handlePayment}
+                            disabled={isPaying}
                         >
                             <Text style={styles.payButtonText}>Thanh Toán</Text>
                         </TouchableOpacity>
@@ -162,43 +160,6 @@ const CongNo = () => {
             )}
 
 
-
-
-            {/* Modal Ngân Hàng */}
-            <TouchableOpacity style={styles.dropdown} onPress={() => setModalBankVisible(true)}>
-                <Text style={styles.dropdownText}>
-                    {selectedBank ? selectedBank : 'Chọn ngân hàng'}
-                </Text>
-                <AntDesign name="down" size={16} color="black" />
-            </TouchableOpacity>
-
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalBankVisible}
-                onRequestClose={() => setModalBankVisible(false)}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <FlatList
-                            data={nganHangOptions}
-                            keyExtractor={(item) => item.key}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    style={styles.modalItem}
-                                    onPress={() => {
-                                        setSelectedBank(item.name);
-                                        setModalBankVisible(false);
-                                    }}
-                                >
-                                    <Text style={styles.modalItemText}>{item.name}</Text>
-                                </TouchableOpacity>
-                            )}
-                        />
-                        <Button title="Đóng" onPress={() => setModalBankVisible(false)} />
-                    </View>
-                </View>
-            </Modal>
             {!loading && khauTruData.length > 0 && (
                 <View style={styles.khauTruContainer}>
                     <Text style={styles.sectionTitle}>Khấu trừ</Text>
@@ -366,16 +327,21 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         color: 'black',
     },
+
     payButton: {
+        padding: 15,
         backgroundColor: '#0977FE',
-        padding: 10,
         borderRadius: 5,
-        marginTop: 5,
+        alignItems: 'center',
+        marginVertical: 20,
+    },
+    disabledPayButton: {
+        backgroundColor: '#ccc',
     },
     payButtonText: {
-        color: 'white',
-        textAlign: 'center',
-        fontSize: 14,
+        color: '#fff',
+        fontSize: 16,
         fontWeight: 'bold',
     },
+
 });

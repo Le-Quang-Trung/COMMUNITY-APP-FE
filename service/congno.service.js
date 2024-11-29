@@ -62,25 +62,28 @@ export const getKhauTruByMSSV = async (MSSV) => {
     }
 };
 
-export const thanhToanCongNo = async(MSSV, nganh, hocKy, nganHang) => {
+export const thanhToanCongNo = async (MSSV, nganh, hocKy, bankCode = 'NCB', language = 'vn') => {
     try {
-        const response = await fetch(`${host}/congno/thanhToan/${MSSV}/${nganh}/${hocKy}`, {
+        const url = `${host}/congno/thanhToan/${MSSV}/${nganh}/${hocKy}`;
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ nganHang }), // Truyền thêm thông tin ngân hàng nếu cần
+            body: JSON.stringify({
+                bankCode,
+                language,
+            }),
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to process payment');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        return data;
+        return data.vnpUrl; // URL thanh toán từ backend
     } catch (error) {
-        console.error('Error in thanhToanCongNo:', error.message);
+        console.error('Error in thanhToanCongNo:', error);
         throw error;
     }
-}
+};
