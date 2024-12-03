@@ -51,7 +51,8 @@ const LichHocLichThi = () => {
                 subject: schedule.tenMonHoc,
                 room: scheduledDay.phongHoc,
                 time: scheduledDay.tietHoc,
-                teacher: schedule.tenGV
+                teacher: schedule.tenGV,
+                phanLoai: scheduledDay.phanLoai
               });
             }
           }
@@ -137,6 +138,9 @@ const LichHocLichThi = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerbar}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <AntDesign name="arrowleft" size={24} color="white" />
+        </TouchableOpacity>
         <Text style={styles.Headers}>Thời khóa biểu</Text>
       </View>
       <View style={styles.dateHeader}>
@@ -178,18 +182,31 @@ const LichHocLichThi = () => {
         />
       </View>
 
-      {selectedDay && (
-        <View style={styles.scheduleDetails}>
-          {selectedDay.map((schedule, index) => (
-            <View key={index}>
-              <Text style={styles.detailText}>Môn học: {schedule.subject}</Text>
-              <Text style={styles.detailText}>Phòng học: {schedule.room}</Text>
-              <Text style={styles.detailText}>Giờ học: {schedule.time}</Text>
-              <Text style={styles.detailText}>Giảng viên: {schedule.teacher}</Text>
-            </View>
-          ))}
-        </View>
-      )}
+      {selectedDay && Array.isArray(selectedDay) && selectedDay.map((schedule, index) => {
+        const getScheduleStyle = (type) => {
+          switch (type) {
+            case 'Lý thuyết':
+              return styles.lyThuyet;
+            case 'Thực hành':
+              return styles.thucHanh;
+            case 'Thi':
+              return styles.thi;
+            default:
+              return styles.defaultSchedule;
+          }
+        };
+
+        return (
+          <View key={index} style={[styles.scheduleDetails, getScheduleStyle(schedule.phanLoai)]}>
+            <Text style={styles.detailText}>Môn học: {schedule.subject}</Text>
+            <Text style={styles.detailText}>Phòng học: {schedule.room}</Text>
+            <Text style={styles.detailText}>Giờ học: {schedule.time}</Text>
+            <Text style={styles.detailText}>Giảng viên: {schedule.teacher}</Text>
+            <Text style={styles.detailText}>Phân loại: {schedule.phanLoai}</Text>
+          </View>
+        );
+      })}
+
 
       <Modal
         animationType="slide"
@@ -217,7 +234,7 @@ const styles = StyleSheet.create({
   headerbar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: 'rgba(58, 131, 244, 0.4)',
+    backgroundColor: '#0977FE',
     padding: 10,
   },
   Headers: {
@@ -274,12 +291,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'blue',
     marginTop: 5,
   },
-  scheduleDetails: {
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-  },
   detailText: {
     fontSize: 16,
     color: 'black',
@@ -321,5 +332,25 @@ const styles = StyleSheet.create({
   hasScheduleText: {
     fontWeight: 'bold',
     color: 'darkblue',
+  },
+  scheduleDetails: {
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f9f9f9', // Mặc định
+  },
+  lyThuyet: {
+    backgroundColor: '#f9f9f9', // Màu xám nhạt
+  },
+  thucHanh: {
+    backgroundColor: '#add8e6', // Màu xanh dương nhạt
+  },
+  thi: {
+    backgroundColor: '#fdff9a', // Màu vàng
+  },
+  defaultSchedule: {
+    backgroundColor: '#f9f9f9', // Mặc định nếu không khớp
   },
 });

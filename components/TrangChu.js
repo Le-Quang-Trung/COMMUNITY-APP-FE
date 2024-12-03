@@ -4,7 +4,7 @@ import moment from 'moment';
 import { FontAwesome, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { getLichHocByMSSV } from '../service/lichhoclichthi.service';
+import { getLichHocByMSSV, getLichDayByMaGV } from '../service/lichhoclichthi.service';
 import { getSinhVienByMSSV } from '../service/sinhvien.service';
 import { getGiangVienByMaGV } from '../service/giangvien.service';
 import { getQuanLyByMaQL } from '../service/quanly.service';
@@ -20,6 +20,7 @@ const TrangChu = () => {
     const setQuanLyData = useSetRecoilState(quanLyDataState);
     const navigation = useNavigation();
     const [todaySchedule, setTodaySchedule] = useState(null);
+    const [todayTeachingSchedule, setTodayTeachingSchedule] = useState(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -31,6 +32,7 @@ const TrangChu = () => {
                 } else if (user.role === 'giảng viên') {
                     const giangVienData = await getGiangVienByMaGV(user.data.tenTaiKhoan);
                     setGiangVienData(giangVienData); // Cập nhật thông tin giảng viên vào Recoil
+                    fetchTodayTeachingSchedule(giangVienData.maGV) // Gọi hàm lấy lịch hôm nay
                 } else if (user.role === 'quản lý') {
                     const quanLyData = await getQuanLyByMaQL(user.data.tenTaiKhoan);
                     setQuanLyData(quanLyData); // Cập nhật thông tin quản lý vào Recoil
@@ -69,6 +71,34 @@ const TrangChu = () => {
         }
     };
 
+    const fetchTodayTeachingSchedule = async (maGV) => {
+        try {
+            const schedules = await getLichDayByMaGV(maGV);
+            const today = moment();
+            const todayFormatted = today.format('YYYY-MM-DD');
+
+            const todayData = schedules.filter(schedule => {
+                const startDate = moment(schedule.ngayBatDau);
+                const endDate = moment(schedule.ngayKetThuc);
+
+                // Kiểm tra nếu hôm nay nằm trong khoảng thời gian học
+                if (today.isBetween(startDate, endDate, 'days', '[]')) {
+                    // Kiểm tra lịch học có trùng ngày trong tuần của hôm nay không
+                    const dayOfWeek = today.isoWeekday(); // 1 (Thứ 2) -> 7 (Chủ nhật)
+                    return schedule.lichHoc.some(lich => lich.ngayHoc === dayOfWeek);
+                }
+                return false;
+            });
+
+            setTodayTeachingSchedule(todayData.length > 0 ? todayData : null); // Cập nhật state lịch hôm nay
+        } catch (error) {
+            console.error('Lỗi khi lấy lịch hôm nay:', error);
+        }
+    };
+
+
+    console.log("a", todayTeachingSchedule)
+
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -91,9 +121,15 @@ const TrangChu = () => {
                     <View>
                         <Text style={styles.scheduleTitle}>Lịch hôm nay:</Text>
                         <Text style={styles.scheduleContent}>
-                            {todaySchedule
-                                ? `Bạn có ${todaySchedule.length} lịch học hôm nay`
-                                : 'Không tìm thấy lịch học/lịch thi'}
+                            {user.role === 'sinh viên' 
+                                ? (todaySchedule
+                                    ? `Bạn có ${todaySchedule.length} lịch học hôm nay`
+                                    : 'Không tìm thấy lịch học/lịch thi')
+                                : (user.role === 'giảng viên'
+                                    ? (todayTeachingSchedule
+                                        ? `Bạn có ${todayTeachingSchedule.length} lịch giảng dạy hôm nay`
+                                        : 'Không tìm thấy lịch giảng dạy')
+                                    : '')}
                         </Text>
                     </View>
                 </TouchableOpacity>

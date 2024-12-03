@@ -33,12 +33,12 @@ const DanhSachSinhVienLHP = ({ route }) => {
             <Text style={styles.nganh}>Ngành: {item.nganh}</Text>
             <View style={styles.buttonContainer}>
                 {/* Nút "Thêm Sinh viên" */}
-                <TouchableOpacity
+                {/* <TouchableOpacity
                     style={styles.button}
                     onPress={() => navigation.navigate('TaoDiemSo', { maMonHoc, tenLHP, mssv: item.mssv })}
                 >
                     <Text style={styles.buttonText}>Tạo Điểm Số</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 {/* Nút "Tạo Lịch học" */}
                 <TouchableOpacity

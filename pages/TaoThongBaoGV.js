@@ -47,7 +47,7 @@ const TaoThongBaoGV = () => {
                     onPress={() => navigation.goBack()} 
                     style={styles.searchIcon} 
                 />
-                <Text style={styles.title}>Tạo Thông Báo</Text>
+                <Text style={styles.title}>Đánh Giá Học Tập</Text>
             </View>
 
             <View style={styles.row}>
