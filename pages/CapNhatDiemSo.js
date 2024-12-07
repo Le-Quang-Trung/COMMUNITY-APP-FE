@@ -52,6 +52,18 @@ const CapNhatDiemSo = ({ route }) => {
 
     // Handle the form submission to update scores
     const handleCapNhatDiemSo = async () => {
+
+        // Convert inputs to numbers for validation
+        const diemSoValues = [diemTK1, diemTK2, diemTK3, diemGK, diemCK].map(Number);
+
+        // Validate that all scores are between 0 and 10
+        const isValid = diemSoValues.every((score) => score >= 0 && score <= 10);
+
+        if (!isValid) {
+            Alert.alert('Lỗi','Chỉ được nhập điểm từ 0-10.');
+            return;
+        }
+
         const diemSoData = {
             lopHoc: tenLHP,
             monHoc: monHocData?.tenMonHoc,
@@ -105,8 +117,9 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    value={diemTK1 ? diemTK1.toString() : ''} 
-                    onChangeText={setDiemTK1} 
+                    value={diemTK1 ? diemTK1.toString() : ''}
+                    onChangeText={setDiemTK1}
+                    keyboardType="numeric"
                     style={[styles.input, styles.inputBorder]}
                 />
             </View>
@@ -116,8 +129,9 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    value={diemTK2 ? diemTK2.toString() : ''} 
-                    onChangeText={setDiemTK2} 
+                    value={diemTK2 ? diemTK2.toString() : ''}
+                    onChangeText={setDiemTK2}
+                    keyboardType="numeric"
                     style={[styles.input, styles.inputBorder]}
                 />
             </View>
@@ -127,8 +141,9 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    value={diemTK3 ? diemTK3.toString() : ''} 
-                    onChangeText={setDiemTK3} 
+                    value={diemTK3 ? diemTK3.toString() : ''}
+                    onChangeText={setDiemTK3}
+                    keyboardType="numeric"
                     style={[styles.input, styles.inputBorder]}
                 />
             </View>
@@ -138,8 +153,9 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    value={diemGK ? diemGK.toString() : ''} 
+                    value={diemGK ? diemGK.toString() : ''}
                     onChangeText={setDiemGK}
+                    keyboardType="numeric"
                     style={[styles.input, styles.inputBorder]}
                 />
             </View>
@@ -149,8 +165,9 @@ const CapNhatDiemSo = ({ route }) => {
             </View>
             <View style={styles.inputContainer}>
                 <TextInput
-                    value={diemCK ? diemCK.toString() : ''} 
-                    onChangeText={setDiemCK} 
+                    value={diemCK ? diemCK.toString() : ''}
+                    onChangeText={setDiemCK}
+                    keyboardType="numeric"
                     style={[styles.input, styles.inputBorder]}
                 />
             </View>
