@@ -108,6 +108,10 @@ const CaNhan = () => {
                             <Text style={styles.label}>Địa chỉ:</Text>
                             <Text style={styles.value}>{giangVienData.diaChi}</Text>
                         </View>
+                        <View style={styles.infoRow}>
+                            <Text style={styles.label}>Ngành:</Text>
+                            <Text style={styles.value}>{giangVienData.nganh}</Text>
+                        </View>
                     </>
                 ) : role === 'quản lý' ? (
                     <>

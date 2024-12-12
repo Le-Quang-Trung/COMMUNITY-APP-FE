@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Button, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { getTTLopHocPhan } from '../service/thongtinlophoc.service';
+import { getLopHocPhan } from '../service/giangvien.service';
 import { useRecoilValue } from 'recoil';
 import { giangVienDataState } from '../state';
 
@@ -18,27 +18,28 @@ const XemThongTinLopHoc = () => {
 
     const semesters = Array.from({ length: 9 }, (_, i) => `Học kỳ ${i + 1}`);
 
+
     const handleSelectSemester = async (semester) => {
         setSelectedSemester(semester);
         setModalVisible(false);
         setLoading(true);
         setError(null);
-
-        const hocKyNumber = `HK${semester.split(" ")[2]}`; // Tách học kỳ (ví dụ: HK1 từ "Học kỳ 1")
-
+    
+        // Extract semester number
+        const hocKyNumber = `HK${semester.split(" ")[2]}`;
+    
         try {
-            const data = await getTTLopHocPhan(giangVienData.maGV);
-
-            // Lọc lớp học phần theo mã học kỳ
-            const filteredData = data.filter(item => item.maHK.startsWith(hocKyNumber));
-
-            setSemesterData(filteredData);
+            // Call the updated API function
+            const data = await getLopHocPhan(giangVienData.maGV,  giangVienData.nganh, hocKyNumber);
+    
+            setSemesterData(data);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
+    
 
     const renderCourseItem = ({ item }) => {
         return (

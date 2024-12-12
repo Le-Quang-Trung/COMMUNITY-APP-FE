@@ -17,6 +17,30 @@ export const getGiangVienByMaGV = async (maGV) => {
 };
 
 
+export const  getLopHocPhan = async (maGV, nganh, hocKy) => {
+    
+    try {
+        const response = await fetch(`${host}/giangvien/getLopHocPhan/${maGV}/${nganh}/${hocKy}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            // Xử lý lỗi từ backend
+            const error = await response.json();
+            throw new Error(error.message || 'Có lỗi xảy ra khi lấy danh sách lớp học phần.');
+        }
+
+        // Trả về danh sách lớp học phần
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching LopHocPhan:', error.message);
+        throw error;
+    }
+}
+
 export async function danhGiaHocTap(payload) {
     try {
         const response = await fetch(`${host}/giangvien/danhGiaHocTap`, {
