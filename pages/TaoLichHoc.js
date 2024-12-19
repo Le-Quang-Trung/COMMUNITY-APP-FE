@@ -221,7 +221,7 @@ const TaoLichHoc = ({ route }) => {
                 <TextInput
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    placeholder="YYYY-MM-DD"
+                    placeholder="01-01-2024"
                     value={ngayBatDau}
                     onChangeText={setNgayBatDau}
                 />
@@ -235,7 +235,7 @@ const TaoLichHoc = ({ route }) => {
                 <TextInput
                     placeholderTextColor="#D9D9D9"
                     style={[styles.input, styles.inputBorder]}
-                    placeholder="YYYY-MM-DD"
+                    placeholder="31-01-2024"
                     value={ngayKetThuc}
                     onChangeText={setNgayKetThuc}
                 />
